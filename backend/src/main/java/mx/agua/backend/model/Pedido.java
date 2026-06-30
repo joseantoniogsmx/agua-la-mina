@@ -16,6 +16,12 @@ public class Pedido {
     @JoinColumn(name = "cliente_id")
     private Cliente cliente;
 
+    // NUEVO: relación con la tabla productos
+    @ManyToOne
+    @JoinColumn(name = "producto_id")
+    private Producto producto;
+
+    // Se conserva temporalmente para no romper el sistema
     private String marca;
 
     private Integer cantidad;
@@ -74,6 +80,14 @@ public class Pedido {
 
     public void setCliente(Cliente cliente) {
         this.cliente = cliente;
+    }
+
+    public Producto getProducto() {
+        return producto;
+    }
+
+    public void setProducto(Producto producto) {
+        this.producto = producto;
     }
 
     public String getMarca() {
