@@ -4,6 +4,7 @@ import mx.agua.backend.model.Pedido;
 import mx.agua.backend.model.Producto;
 import mx.agua.backend.repository.PedidoRepository;
 import mx.agua.backend.repository.ProductoRepository;
+import mx.agua.backend.service.PedidoService;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
@@ -15,11 +16,16 @@ public class PedidoController {
 
     private final PedidoRepository pedidoRepository;
     private final ProductoRepository productoRepository;
+    private final PedidoService pedidoService;
 
-    public PedidoController(PedidoRepository pedidoRepository,
-                            ProductoRepository productoRepository) {
+    public PedidoController(
+            PedidoRepository pedidoRepository,
+            ProductoRepository productoRepository,
+            PedidoService pedidoService) {
+
         this.pedidoRepository = pedidoRepository;
         this.productoRepository = productoRepository;
+        this.pedidoService = pedidoService;
     }
 
     @GetMapping("/pedidos")
@@ -36,8 +42,7 @@ public class PedidoController {
     public ResponseEntity<?> crearPedido(@RequestBody Pedido pedido) {
 
         if (pedido.getProducto() == null || pedido.getProducto().getId() == null) {
-            return ResponseEntity.badRequest()
-                    .body("Debe seleccionar un producto.");
+            return ResponseEntity.badRequest().body("Debe seleccionar un producto.");
         }
 
         Producto producto = productoRepository
@@ -45,13 +50,10 @@ public class PedidoController {
                 .orElse(null);
 
         if (producto == null) {
-            return ResponseEntity.badRequest()
-                    .body("Producto inexistente.");
+            return ResponseEntity.badRequest().body("Producto inexistente.");
         }
 
         pedido.setProducto(producto);
-
-        // Se conserva temporalmente la columna marca
         pedido.setMarca(producto.getMarca());
 
         BigDecimal total = producto.getPrecio()
@@ -59,21 +61,12 @@ public class PedidoController {
 
         pedido.setTotal(total);
 
-        return ResponseEntity.ok(
-                pedidoRepository.save(pedido)
-        );
+        return ResponseEntity.ok(pedidoRepository.save(pedido));
     }
 
-    @PutMapping("/pedidos/{id}/en-ruta")
-    public ResponseEntity<Pedido> iniciarRuta(@PathVariable Integer id) {
-
-        return pedidoRepository.findById(id)
-                .map(pedido -> {
-                    pedido.setEstado("EN_RUTA");
-                    pedidoRepository.save(pedido);
-                    return ResponseEntity.ok(pedido);
-                })
-                .orElse(ResponseEntity.notFound().build());
+    @PostMapping("/pedidos/iniciar-ruta")
+    public List<Pedido> iniciarRuta() {
+        return pedidoService.generarRuta();
     }
 
     @PutMapping("/pedidos/{id}/entregado")

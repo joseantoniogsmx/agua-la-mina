@@ -10,6 +10,13 @@ public interface PedidoRepository extends JpaRepository<Pedido, Integer> {
 
     List<Pedido> findByEstado(String estado);
 
+    List<Pedido> findByEstadoOrderByFechaAsc(String estado);
+
+    List<Pedido> findByEstadoAndPrioridadOrderByFechaAsc(
+            String estado,
+            String prioridad
+    );
+
     Optional<Pedido> findById(Integer id);
 
 }
