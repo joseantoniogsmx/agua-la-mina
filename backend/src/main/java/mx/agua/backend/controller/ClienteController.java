@@ -2,10 +2,8 @@ package mx.agua.backend.controller;
 
 import mx.agua.backend.model.Cliente;
 import mx.agua.backend.repository.ClienteRepository;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
 
@@ -27,4 +25,23 @@ public class ClienteController {
     public Cliente crearCliente(@RequestBody Cliente cliente) {
         return clienteRepository.save(cliente);
     }
+
+    @PutMapping("/clientes/{id}/ubicacion")
+    public ResponseEntity<Cliente> actualizarUbicacion(
+            @PathVariable Integer id,
+            @RequestBody Cliente datosUbicacion) {
+
+        return clienteRepository.findById(id)
+                .map(cliente -> {
+
+                    cliente.setLatitud(datosUbicacion.getLatitud());
+                    cliente.setLongitud(datosUbicacion.getLongitud());
+
+                    clienteRepository.save(cliente);
+
+                    return ResponseEntity.ok(cliente);
+                })
+                .orElse(ResponseEntity.notFound().build());
+    }
+
 }
