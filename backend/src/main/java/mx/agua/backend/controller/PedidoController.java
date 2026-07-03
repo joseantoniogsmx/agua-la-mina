@@ -4,7 +4,7 @@ import mx.agua.backend.model.Pedido;
 import mx.agua.backend.model.Producto;
 import mx.agua.backend.repository.PedidoRepository;
 import mx.agua.backend.repository.ProductoRepository;
-import mx.agua.backend.service.PedidoService;
+import mx.agua.backend.service.routing.RutaService;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
@@ -16,16 +16,16 @@ public class PedidoController {
 
     private final PedidoRepository pedidoRepository;
     private final ProductoRepository productoRepository;
-    private final PedidoService pedidoService;
+    private final RutaService rutaService;
 
     public PedidoController(
             PedidoRepository pedidoRepository,
             ProductoRepository productoRepository,
-            PedidoService pedidoService) {
+            RutaService rutaService) {
 
         this.pedidoRepository = pedidoRepository;
         this.productoRepository = productoRepository;
-        this.pedidoService = pedidoService;
+        this.rutaService = rutaService;
     }
 
     @GetMapping("/pedidos")
@@ -54,6 +54,9 @@ public class PedidoController {
         }
 
         pedido.setProducto(producto);
+
+        // Conservamos la marca en el pedido para que el repartidor
+        // siempre la vea rápidamente.
         pedido.setMarca(producto.getMarca());
 
         BigDecimal total = producto.getPrecio()
@@ -66,7 +69,7 @@ public class PedidoController {
 
     @PostMapping("/pedidos/iniciar-ruta")
     public List<Pedido> iniciarRuta() {
-        return pedidoService.generarRuta();
+        return rutaService.generarRuta();
     }
 
     @PutMapping("/pedidos/{id}/entregado")
