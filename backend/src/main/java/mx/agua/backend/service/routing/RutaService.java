@@ -1,6 +1,7 @@
 package mx.agua.backend.service.routing;
 
 import mx.agua.backend.model.Pedido;
+import mx.agua.backend.model.PedidoEstado;
 import mx.agua.backend.repository.PedidoRepository;
 import mx.agua.backend.service.ConfiguracionService;
 import org.springframework.stereotype.Service;
@@ -33,7 +34,7 @@ public class RutaService {
                 configuracionService.obtenerLongitudPurificadora();
 
         List<Pedido> pedidos =
-                pedidoRepository.findByEstado("PENDIENTE");
+                pedidoRepository.findByEstado(PedidoEstado.PENDIENTE);
 
         int orden = 1;
 
@@ -54,7 +55,7 @@ public class RutaService {
             );
 
             pedido.setOrdenRuta(orden++);
-            pedido.setEstado("EN_RUTA");
+            pedido.setEstado(PedidoEstado.EN_RUTA);
         }
 
         return pedidoRepository.saveAll(pedidos);

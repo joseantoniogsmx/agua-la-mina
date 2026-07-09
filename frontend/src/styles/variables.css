@@ -1,0 +1,46 @@
+:root{
+
+    /* ==========
+       Marca
+       ========== */
+
+    --primary:#0B4F8A;
+    --primary-dark:#083A67;
+    --primary-light:#2F8FD6;
+
+    /* Agua */
+
+    --secondary:#56B7E8;
+    --secondary-light:#DDF5FF;
+
+    /* Estados */
+
+    --success:#2E8B57;
+    --warning:#D9A404;
+    --danger:#C94A4A;
+    --info:#3B82F6;
+
+    /* Fondos */
+
+    --background:#F4F8FB;
+    --surface:#FFFFFF;
+
+    /* Texto */
+
+    --text:#243746;
+    --text-light:#6C757D;
+
+    /* Bordes */
+
+    --border:#D9E5EF;
+
+    /* Sombras */
+
+    --shadow:
+        0 8px 24px rgba(0,0,0,.08);
+
+    /* Radios */
+
+    --radius:14px;
+
+}

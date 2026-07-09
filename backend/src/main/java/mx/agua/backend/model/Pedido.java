@@ -1,6 +1,7 @@
 package mx.agua.backend.model;
 
 import jakarta.persistence.*;
+
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
 
@@ -16,12 +17,14 @@ public class Pedido {
     @JoinColumn(name = "cliente_id")
     private Cliente cliente;
 
-    // NUEVO: relación con la tabla productos
     @ManyToOne
     @JoinColumn(name = "producto_id")
     private Producto producto;
 
-    // Se conserva temporalmente para no romper el sistema
+    /**
+     * Se conserva para mostrar rápidamente la marca
+     * aunque el producto cambie en el futuro.
+     */
     private String marca;
 
     private Integer cantidad;
@@ -39,6 +42,11 @@ public class Pedido {
 
     private LocalDateTime fecha;
 
+    /**
+     * CAJERO
+     * WEB
+     * WHATSAPP
+     */
     private String origen;
 
     @Column(columnDefinition = "TEXT")
@@ -49,12 +57,13 @@ public class Pedido {
 
     @PrePersist
     public void prePersist() {
+
         if (fecha == null) {
             fecha = LocalDateTime.now();
         }
 
         if (estado == null) {
-            estado = "PENDIENTE";
+            estado = PedidoEstado.PENDIENTE;
         }
 
         if (prioridad == null) {
@@ -169,4 +178,5 @@ public class Pedido {
     public void setNotas(String notas) {
         this.notas = notas;
     }
+
 }
