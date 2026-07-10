@@ -1,15 +1,11 @@
 package mx.agua.backend.model;
 
-public final class PedidoEstado {
+public enum PedidoEstado {
 
-    private PedidoEstado() {
-        // Evita que esta clase pueda instanciarse.
-    }
+    PENDIENTE,
 
-    public static final String PENDIENTE = "PENDIENTE";
+    EN_RUTA,
 
-    public static final String EN_RUTA = "EN_RUTA";
-
-    public static final String ENTREGADO = "ENTREGADO";
+    ENTREGADO
 
 }

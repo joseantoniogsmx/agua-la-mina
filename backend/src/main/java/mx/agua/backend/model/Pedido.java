@@ -1,7 +1,6 @@
 package mx.agua.backend.model;
 
 import jakarta.persistence.*;
-
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
 
@@ -21,10 +20,6 @@ public class Pedido {
     @JoinColumn(name = "producto_id")
     private Producto producto;
 
-    /**
-     * Se conserva para mostrar rápidamente la marca
-     * aunque el producto cambie en el futuro.
-     */
     private String marca;
 
     private Integer cantidad;
@@ -35,18 +30,14 @@ public class Pedido {
 
     private String prioridad;
 
-    private String estado;
+    @Enumerated(EnumType.STRING)
+    private PedidoEstado estado;
 
     @Column(name = "orden_ruta")
     private Integer ordenRuta;
 
     private LocalDateTime fecha;
 
-    /**
-     * CAJERO
-     * WEB
-     * WHATSAPP
-     */
     private String origen;
 
     @Column(columnDefinition = "TEXT")
@@ -73,6 +64,7 @@ public class Pedido {
         if (origen == null) {
             origen = "CAJERO";
         }
+
     }
 
     public Integer getId() {
@@ -139,11 +131,11 @@ public class Pedido {
         this.prioridad = prioridad;
     }
 
-    public String getEstado() {
+    public PedidoEstado getEstado() {
         return estado;
     }
 
-    public void setEstado(String estado) {
+    public void setEstado(PedidoEstado estado) {
         this.estado = estado;
     }
 

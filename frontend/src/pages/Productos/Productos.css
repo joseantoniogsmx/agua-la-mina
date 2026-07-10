@@ -1,0 +1,31 @@
+.productos-header{
+
+    margin-bottom:35px;
+
+}
+
+.productos-header h1{
+
+    color:#003B73;
+
+    font-size:34px;
+
+}
+
+.productos-header p{
+
+    color:#6B7280;
+
+    margin-top:8px;
+
+}
+
+.productos-grid{
+
+    display:grid;
+
+    grid-template-columns:repeat(auto-fit,minmax(320px,1fr));
+
+    gap:28px;
+
+}

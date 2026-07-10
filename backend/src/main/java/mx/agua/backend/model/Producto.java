@@ -23,6 +23,14 @@ public class Producto {
     @Column(name = "requiere_envase")
     private Boolean requiereEnvase;
 
+    @Column(name = "color_principal")
+    private String colorPrincipal;
+
+    private String imagen;
+
+    @Column(name = "orden_visual")
+    private Integer ordenVisual;
+
     private Boolean activo;
 
     public Producto() {
@@ -74,6 +82,30 @@ public class Producto {
 
     public void setRequiereEnvase(Boolean requiereEnvase) {
         this.requiereEnvase = requiereEnvase;
+    }
+
+    public String getColorPrincipal() {
+        return colorPrincipal;
+    }
+
+    public void setColorPrincipal(String colorPrincipal) {
+        this.colorPrincipal = colorPrincipal;
+    }
+
+    public String getImagen() {
+        return imagen;
+    }
+
+    public void setImagen(String imagen) {
+        this.imagen = imagen;
+    }
+
+    public Integer getOrdenVisual() {
+        return ordenVisual;
+    }
+
+    public void setOrdenVisual(Integer ordenVisual) {
+        this.ordenVisual = ordenVisual;
     }
 
     public Boolean getActivo() {

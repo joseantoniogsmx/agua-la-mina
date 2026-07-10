@@ -1,0 +1,33 @@
+.dashboard-header{
+
+    margin-bottom:35px;
+
+}
+
+.dashboard-header h1{
+
+    color:#003B73;
+
+    font-size:34px;
+
+    margin-bottom:8px;
+
+}
+
+.dashboard-header p{
+
+    color:#6B7280;
+
+    font-size:18px;
+
+}
+
+.dashboard-grid{
+
+    display:grid;
+
+    grid-template-columns:repeat(auto-fit,minmax(250px,1fr));
+
+    gap:24px;
+
+}

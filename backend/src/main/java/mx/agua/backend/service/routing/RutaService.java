@@ -46,7 +46,7 @@ public class RutaService {
                 continue;
             }
 
-            // Consulta a OSRM (por ahora solo para validar la comunicación)
+            // Consulta a OSRM para validar la comunicación
             osrmService.obtenerRuta(
                     latPurificadora,
                     lonPurificadora,
