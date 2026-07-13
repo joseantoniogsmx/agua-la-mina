@@ -1,0 +1,55 @@
+.pedidos-page{
+
+    padding:10px;
+
+}
+
+.pedidos-header{
+
+    display:flex;
+
+    justify-content:space-between;
+
+    align-items:center;
+
+    margin-bottom:30px;
+
+}
+
+.pedidos-header h1{
+
+    color:#003B73;
+
+    margin-bottom:6px;
+
+}
+
+.pedidos-header p{
+
+    color:#6B7280;
+
+}
+
+.btn-primary{
+
+    background:#005A9C;
+
+    color:white;
+
+    border:none;
+
+    padding:14px 24px;
+
+    border-radius:12px;
+
+    cursor:pointer;
+
+    font-weight:600;
+
+}
+
+.btn-primary:hover{
+
+    background:#0078D4;
+
+}

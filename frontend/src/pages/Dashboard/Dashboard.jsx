@@ -9,7 +9,7 @@ import {
 
 import { useEffect, useState } from "react";
 
-import StatCard from "../../components/common/StatCard";
+import StatCard from "../../components/common/StatCard/StatCard";
 
 import { obtenerDashboard } from "../../services/dashboardService";
 

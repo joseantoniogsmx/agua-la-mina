@@ -1,31 +1,176 @@
+.productos-page{
+
+    width:100%;
+    padding:10px;
+
+}
+
 .productos-header{
 
-    margin-bottom:35px;
+    display:flex;
+    justify-content:space-between;
+    align-items:center;
+    margin-bottom:40px;
+    flex-wrap:wrap;
+    gap:20px;
 
 }
 
 .productos-header h1{
 
     color:#003B73;
-
-    font-size:34px;
+    font-size:38px;
+    margin-bottom:6px;
 
 }
 
 .productos-header p{
 
     color:#6B7280;
+    font-size:16px;
 
-    margin-top:8px;
+}
+
+.btn-primary{
+
+    background:#005A9C;
+    color:white;
+    border:none;
+    border-radius:12px;
+    padding:14px 24px;
+    cursor:pointer;
+    font-size:15px;
+    font-weight:600;
+    transition:.25s;
+
+}
+
+.btn-primary:hover{
+
+    background:#0078D4;
+    transform:translateY(-2px);
+
+}
+
+.productos-toolbar{
+
+    display:flex;
+    justify-content:space-between;
+    align-items:center;
+    margin-bottom:35px;
+    gap:20px;
+    flex-wrap:wrap;
+
+}
+
+.buscador{
+
+    flex:1;
+    min-width:260px;
+    padding:14px 18px;
+    border-radius:12px;
+    border:1px solid #D6DCE5;
+    font-size:15px;
+    outline:none;
+    transition:.25s;
+    background:white;
+
+}
+
+.buscador:focus{
+
+    border-color:#0078D4;
+    box-shadow:0 0 0 3px rgba(0,120,212,.15);
+
+}
+
+.filtros{
+
+    display:flex;
+    gap:12px;
+    flex-wrap:wrap;
+
+}
+
+.filtros button{
+
+    border:none;
+    padding:10px 18px;
+    border-radius:30px;
+    cursor:pointer;
+    font-weight:600;
+    transition:.25s;
+    background:#ECEFF3;
+
+}
+
+.filtros button:hover{
+
+    transform:translateY(-2px);
+
+}
+
+.cielo{
+
+    color:#0078D4;
+
+}
+
+.electropura{
+
+    color:#005A9C;
+
+}
+
+.bonafont{
+
+    color:#F58220;
+
+}
+
+.activo{
+
+    color:white !important;
+    background:#003B73 !important;
 
 }
 
 .productos-grid{
 
     display:grid;
-
     grid-template-columns:repeat(auto-fit,minmax(320px,1fr));
-
     gap:28px;
+
+}
+
+/* Responsive */
+
+@media (max-width:768px){
+
+    .productos-header{
+
+        flex-direction:column;
+        align-items:flex-start;
+
+    }
+
+    .productos-toolbar{
+
+        flex-direction:column;
+        align-items:stretch;
+
+    }
+
+    .buscador{
+
+        width:100%;
+
+    }
+
+    .filtros{
+
+        justify-content:center;
+
+    }
 
 }

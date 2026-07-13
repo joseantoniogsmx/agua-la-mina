@@ -1,0 +1,197 @@
+.product-card{
+
+    background:white;
+
+    border-radius:22px;
+
+    overflow:hidden;
+
+    box-shadow:0 12px 30px rgba(0,0,0,.08);
+
+    transition:.30s;
+
+    display:flex;
+
+    flex-direction:column;
+
+}
+
+.product-card:hover{
+
+    transform:translateY(-8px);
+
+    box-shadow:0 20px 45px rgba(0,0,0,.14);
+
+}
+
+.product-image{
+
+    height:270px;
+
+    display:flex;
+
+    justify-content:center;
+
+    align-items:center;
+
+    overflow:hidden;
+
+}
+
+.product-image img{
+
+    max-width:82%;
+
+    max-height:220px;
+
+    transition:.35s;
+
+}
+
+.product-card:hover img{
+
+    transform:scale(1.08);
+
+}
+
+.product-content{
+
+    padding:24px;
+
+}
+
+.marca-badge{
+
+    color:white;
+
+    padding:8px 16px;
+
+    border-radius:40px;
+
+    font-size:13px;
+
+    font-weight:bold;
+
+    display:inline-block;
+
+    margin-bottom:18px;
+
+}
+
+.product-content h2{
+
+    color:#003B73;
+
+    margin-bottom:10px;
+
+    font-size:24px;
+
+}
+
+.capacidad{
+
+    color:#7B8794;
+
+    margin-bottom:18px;
+
+}
+
+.precio{
+
+    font-size:40px;
+
+    font-weight:bold;
+
+    color:#005A9C;
+
+    margin-bottom:20px;
+
+}
+
+.estado{
+
+    display:flex;
+
+    align-items:center;
+
+    gap:10px;
+
+    color:#0F766E;
+
+    font-weight:600;
+
+    margin-bottom:25px;
+
+}
+
+.punto{
+
+    width:12px;
+
+    height:12px;
+
+    border-radius:50%;
+
+    background:#10B981;
+
+}
+
+.acciones{
+
+    display:flex;
+
+    gap:14px;
+
+}
+
+.btn-editar{
+
+    flex:1;
+
+    background:#005A9C;
+
+    color:white;
+
+    border:none;
+
+    border-radius:10px;
+
+    padding:12px;
+
+    cursor:pointer;
+
+    transition:.25s;
+
+}
+
+.btn-editar:hover{
+
+    background:#0078D4;
+
+}
+
+.btn-desactivar{
+
+    flex:1;
+
+    background:#F3F4F6;
+
+    color:#374151;
+
+    border:none;
+
+    border-radius:10px;
+
+    padding:12px;
+
+    cursor:pointer;
+
+    transition:.25s;
+
+}
+
+.btn-desactivar:hover{
+
+    background:#E5E7EB;
+
+}

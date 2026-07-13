@@ -56,9 +56,6 @@ public class PedidoController {
 
         pedido.setProducto(producto);
 
-        // Conservamos la marca para mostrarla rápidamente al repartidor
-        pedido.setMarca(producto.getMarca());
-
         BigDecimal total = producto.getPrecio()
                 .multiply(BigDecimal.valueOf(pedido.getCantidad()));
 

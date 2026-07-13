@@ -20,8 +20,6 @@ public class Pedido {
     @JoinColumn(name = "producto_id")
     private Producto producto;
 
-    private String marca;
-
     private Integer cantidad;
 
     private BigDecimal total;
@@ -89,14 +87,6 @@ public class Pedido {
 
     public void setProducto(Producto producto) {
         this.producto = producto;
-    }
-
-    public String getMarca() {
-        return marca;
-    }
-
-    public void setMarca(String marca) {
-        this.marca = marca;
     }
 
     public Integer getCantidad() {
