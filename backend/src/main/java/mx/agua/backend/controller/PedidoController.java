@@ -1,10 +1,12 @@
 package mx.agua.backend.controller;
 
+import mx.agua.backend.dto.CrearPedidoRequest;
 import mx.agua.backend.model.Pedido;
 import mx.agua.backend.model.PedidoEstado;
 import mx.agua.backend.model.Producto;
 import mx.agua.backend.repository.PedidoRepository;
 import mx.agua.backend.repository.ProductoRepository;
+import mx.agua.backend.service.PedidoService;
 import mx.agua.backend.service.routing.RutaService;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -18,15 +20,18 @@ public class PedidoController {
     private final PedidoRepository pedidoRepository;
     private final ProductoRepository productoRepository;
     private final RutaService rutaService;
+    private final PedidoService pedidoService;
 
     public PedidoController(
             PedidoRepository pedidoRepository,
             ProductoRepository productoRepository,
-            RutaService rutaService) {
+            RutaService rutaService,
+            PedidoService pedidoService) {
 
         this.pedidoRepository = pedidoRepository;
         this.productoRepository = productoRepository;
         this.rutaService = rutaService;
+        this.pedidoService = pedidoService;
     }
 
     @GetMapping("/pedidos")
@@ -39,6 +44,12 @@ public class PedidoController {
         return pedidoRepository.findByEstado(PedidoEstado.PENDIENTE);
     }
 
+    /*
+     * ==========================================
+     * ENDPOINT ANTIGUO
+     * Se conserva temporalmente.
+     * ==========================================
+     */
     @PostMapping("/pedidos")
     public ResponseEntity<?> crearPedido(@RequestBody Pedido pedido) {
 
@@ -62,6 +73,21 @@ public class PedidoController {
         pedido.setTotal(total);
 
         return ResponseEntity.ok(pedidoRepository.save(pedido));
+    }
+
+    /*
+     * ==========================================
+     * NUEVO ENDPOINT (MÚLTIPLES PRODUCTOS)
+     * ==========================================
+     */
+    @PostMapping("/pedidos/v2")
+    public ResponseEntity<Pedido> crearPedidoV2(
+            @RequestBody CrearPedidoRequest request) {
+
+        Pedido pedido = pedidoService.crearPedido(request);
+
+        return ResponseEntity.ok(pedido);
+
     }
 
     @PostMapping("/pedidos/iniciar-ruta")

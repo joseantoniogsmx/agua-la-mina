@@ -1,8 +1,11 @@
 package mx.agua.backend.model;
 
 import jakarta.persistence.*;
+
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
+import java.util.ArrayList;
+import java.util.List;
 
 @Entity
 @Table(name = "pedidos")
@@ -16,6 +19,11 @@ public class Pedido {
     @JoinColumn(name = "cliente_id")
     private Cliente cliente;
 
+    /*
+     * MODELO ANTIGUO
+     * Se mantiene temporalmente para no romper el sistema
+     * mientras migramos completamente a DetallePedido.
+     */
     @ManyToOne
     @JoinColumn(name = "producto_id")
     private Producto producto;
@@ -25,6 +33,16 @@ public class Pedido {
     private BigDecimal total;
 
     private Integer prestados;
+
+    /*
+     * MODELO NUEVO
+     */
+    @OneToMany(
+            mappedBy = "pedido",
+            cascade = CascadeType.ALL,
+            orphanRemoval = true
+    )
+    private List<DetallePedido> detalles = new ArrayList<>();
 
     private String prioridad;
 
@@ -62,6 +80,27 @@ public class Pedido {
         if (origen == null) {
             origen = "CAJERO";
         }
+
+    }
+
+    /**
+     * Mantiene sincronizada la relación bidireccional
+     * entre Pedido y DetallePedido.
+     */
+    public void agregarDetalle(DetallePedido detalle) {
+
+        detalles.add(detalle);
+        detalle.setPedido(this);
+
+    }
+
+    /**
+     * Elimina un detalle del pedido.
+     */
+    public void eliminarDetalle(DetallePedido detalle) {
+
+        detalles.remove(detalle);
+        detalle.setPedido(null);
 
     }
 
@@ -111,6 +150,14 @@ public class Pedido {
 
     public void setPrestados(Integer prestados) {
         this.prestados = prestados;
+    }
+
+    public List<DetallePedido> getDetalles() {
+        return detalles;
+    }
+
+    public void setDetalles(List<DetallePedido> detalles) {
+        this.detalles = detalles;
     }
 
     public String getPrioridad() {
