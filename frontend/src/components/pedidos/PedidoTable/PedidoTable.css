@@ -1,0 +1,115 @@
+.pedido-table{
+
+    width:100%;
+
+    border-collapse:collapse;
+
+    background:white;
+
+    border-radius:12px;
+
+    overflow:hidden;
+
+    margin-top:20px;
+
+    box-shadow:0 2px 10px rgba(0,0,0,.08);
+
+}
+
+.pedido-table th{
+
+    background:#005A9C;
+
+    color:white;
+
+    padding:14px;
+
+    text-align:left;
+
+}
+
+.pedido-table td{
+
+    padding:14px;
+
+    border-bottom:1px solid #ececec;
+
+}
+
+.pedido-table tr:hover{
+
+    background:#f7fbff;
+
+}
+
+.estado{
+
+    padding:6px 12px;
+
+    border-radius:20px;
+
+    font-size:.85rem;
+
+    font-weight:bold;
+
+}
+
+.estado-pendiente{
+
+    background:#fff3cd;
+
+    color:#8a6d3b;
+
+}
+
+.estado-en_ruta{
+
+    background:#d9edf7;
+
+    color:#31708f;
+
+}
+
+.estado-entregado{
+
+    background:#d4edda;
+
+    color:#155724;
+
+}
+
+.btn-ver{
+
+    border:none;
+
+    background:#0078D4;
+
+    color:white;
+
+    border-radius:8px;
+
+    padding:8px 12px;
+
+    cursor:pointer;
+
+}
+
+.btn-ver:hover{
+
+    background:#005A9C;
+
+}
+
+.pedido-table-vacio{
+
+    margin-top:20px;
+
+    padding:30px;
+
+    text-align:center;
+
+    background:white;
+
+    border-radius:12px;
+
+}

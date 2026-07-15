@@ -1,102 +1,80 @@
 package mx.agua.backend.controller;
 
-import mx.agua.backend.dto.CrearPedidoRequest;
+import mx.agua.backend.dto.request.CrearPedidoRequest;
+import mx.agua.backend.dto.response.ClienteResponse;
+import mx.agua.backend.dto.response.DetallePedidoResponse;
+import mx.agua.backend.dto.response.PedidoResponse;
+import mx.agua.backend.model.DetallePedido;
 import mx.agua.backend.model.Pedido;
 import mx.agua.backend.model.PedidoEstado;
-import mx.agua.backend.model.Producto;
 import mx.agua.backend.repository.PedidoRepository;
-import mx.agua.backend.repository.ProductoRepository;
-import mx.agua.backend.service.PedidoService;
+import mx.agua.backend.service.PedidoV2Service;
 import mx.agua.backend.service.routing.RutaService;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
-import java.math.BigDecimal;
 import java.util.List;
+import java.util.stream.Collectors;
 
 @RestController
+@RequestMapping("/pedidos")
 public class PedidoController {
 
     private final PedidoRepository pedidoRepository;
-    private final ProductoRepository productoRepository;
     private final RutaService rutaService;
-    private final PedidoService pedidoService;
+    private final PedidoV2Service pedidoV2Service;
 
     public PedidoController(
             PedidoRepository pedidoRepository,
-            ProductoRepository productoRepository,
             RutaService rutaService,
-            PedidoService pedidoService) {
+            PedidoV2Service pedidoV2Service) {
 
         this.pedidoRepository = pedidoRepository;
-        this.productoRepository = productoRepository;
         this.rutaService = rutaService;
-        this.pedidoService = pedidoService;
+        this.pedidoV2Service = pedidoV2Service;
+
     }
 
-    @GetMapping("/pedidos")
-    public List<Pedido> listarPedidos() {
-        return pedidoRepository.findAll();
+    @GetMapping
+    public List<PedidoResponse> listarPedidos() {
+
+        return pedidoRepository.findAll()
+                .stream()
+                .map(this::convertirPedido)
+                .collect(Collectors.toList());
+
     }
 
-    @GetMapping("/pedidos/pendientes")
-    public List<Pedido> listarPendientes() {
-        return pedidoRepository.findByEstado(PedidoEstado.PENDIENTE);
+    @GetMapping("/pendientes")
+    public List<PedidoResponse> listarPendientes() {
+
+        return pedidoRepository.findByEstado(PedidoEstado.PENDIENTE)
+                .stream()
+                .map(this::convertirPedido)
+                .collect(Collectors.toList());
+
     }
 
-    /*
-     * ==========================================
-     * ENDPOINT ANTIGUO
-     * Se conserva temporalmente.
-     * ==========================================
-     */
-    @PostMapping("/pedidos")
-    public ResponseEntity<?> crearPedido(@RequestBody Pedido pedido) {
-
-        if (pedido.getProducto() == null || pedido.getProducto().getId() == null) {
-            return ResponseEntity.badRequest().body("Debe seleccionar un producto.");
-        }
-
-        Producto producto = productoRepository
-                .findById(pedido.getProducto().getId())
-                .orElse(null);
-
-        if (producto == null) {
-            return ResponseEntity.badRequest().body("Producto inexistente.");
-        }
-
-        pedido.setProducto(producto);
-
-        BigDecimal total = producto.getPrecio()
-                .multiply(BigDecimal.valueOf(pedido.getCantidad()));
-
-        pedido.setTotal(total);
-
-        return ResponseEntity.ok(pedidoRepository.save(pedido));
-    }
-
-    /*
-     * ==========================================
-     * NUEVO ENDPOINT (MÚLTIPLES PRODUCTOS)
-     * ==========================================
-     */
-    @PostMapping("/pedidos/v2")
-    public ResponseEntity<Pedido> crearPedidoV2(
+    @PostMapping
+    public ResponseEntity<Pedido> crearPedido(
             @RequestBody CrearPedidoRequest request) {
 
-        Pedido pedido = pedidoService.crearPedido(request);
+        Pedido pedido = pedidoV2Service.crearPedido(request);
 
         return ResponseEntity.ok(pedido);
 
     }
 
-    @PostMapping("/pedidos/iniciar-ruta")
+    @PostMapping("/iniciar-ruta")
     public List<Pedido> iniciarRuta() {
+
         return rutaService.generarRuta();
+
     }
 
-    @PutMapping("/pedidos/{id}/entregado")
-    public ResponseEntity<Pedido> entregarPedido(@PathVariable Integer id) {
+    @PutMapping("/{id}/entregado")
+    public ResponseEntity<Pedido> entregarPedido(
+            @PathVariable Integer id) {
 
         return pedidoRepository.findById(id)
                 .map(pedido -> {
@@ -109,6 +87,109 @@ public class PedidoController {
 
                 })
                 .orElse(ResponseEntity.notFound().build());
+
+    }
+
+    /*
+     * ======================================
+     * Conversores Entity -> DTO
+     * ======================================
+     */
+
+    private PedidoResponse convertirPedido(Pedido pedido) {
+
+        PedidoResponse response = new PedidoResponse();
+
+        response.setId(pedido.getId());
+
+        response.setTotal(pedido.getTotal());
+
+        response.setPrioridad(pedido.getPrioridad());
+
+        response.setEstado(
+                pedido.getEstado() != null
+                        ? pedido.getEstado().name()
+                        : null
+        );
+
+        response.setFecha(pedido.getFecha());
+
+        response.setOrigen(pedido.getOrigen());
+
+        response.setNotas(pedido.getNotas());
+
+        if (pedido.getCliente() != null) {
+
+            response.setCliente(
+
+                    new ClienteResponse(
+
+                            pedido.getCliente().getId(),
+
+                            pedido.getCliente().getNombre()
+
+                    )
+
+            );
+
+        }
+
+        response.setDetalles(
+
+                pedido.getDetalles()
+
+                        .stream()
+
+                        .map(this::convertirDetalle)
+
+                        .collect(Collectors.toList())
+
+        );
+
+        return response;
+
+    }
+        private DetallePedidoResponse convertirDetalle(
+            DetallePedido detalle) {
+
+        DetallePedidoResponse response =
+                new DetallePedidoResponse();
+
+        response.setId(detalle.getId());
+
+        if (detalle.getProducto() != null) {
+
+            response.setProductoId(
+                    detalle.getProducto().getId()
+            );
+
+            response.setMarca(
+                    detalle.getProducto().getMarca()
+            );
+
+            response.setCapacidadLitros(
+                    detalle.getProducto().getCapacidadLitros()
+            );
+
+        }
+
+        response.setCantidad(
+                detalle.getCantidad()
+        );
+
+        response.setPrestados(
+                detalle.getPrestados()
+        );
+
+        response.setPrecioUnitario(
+                detalle.getPrecioUnitario()
+        );
+
+        response.setSubtotal(
+                detalle.getSubtotal()
+        );
+
+        return response;
 
     }
 

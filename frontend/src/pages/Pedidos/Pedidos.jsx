@@ -6,6 +6,9 @@ import {
 } from "../../services/pedidoService";
 
 import { obtenerProductos } from "../../services/productoService";
+import { obtenerClientes } from "../../services/clienteService";
+
+import PedidoTable from "../../components/pedidos/PedidoTable/PedidoTable";
 
 import "./Pedidos.css";
 
@@ -13,6 +16,12 @@ export default function Pedidos() {
 
     const [pedidos, setPedidos] = useState([]);
     const [productos, setProductos] = useState([]);
+    const [clientes, setClientes] = useState([]);
+
+    const [clienteSeleccionado, setClienteSeleccionado] = useState("");
+
+    const [prioridad, setPrioridad] = useState("NORMAL");
+    const [notas, setNotas] = useState("");
 
     const [productoSeleccionado, setProductoSeleccionado] = useState(null);
 
@@ -30,9 +39,11 @@ export default function Pedidos() {
 
                 const listaPedidos = await obtenerPedidos();
                 const listaProductos = await obtenerProductos();
+                const listaClientes = await obtenerClientes();
 
                 setPedidos(listaPedidos);
                 setProductos(listaProductos);
+                setClientes(listaClientes);
 
             } catch (error) {
 
@@ -94,6 +105,14 @@ export default function Pedidos() {
 
     async function guardarPedido() {
 
+        if (!clienteSeleccionado) {
+
+            alert("Selecciona un cliente.");
+
+            return;
+
+        }
+
         if (pedidoActual.length === 0) {
 
             alert("Agrega al menos un producto.");
@@ -104,12 +123,11 @@ export default function Pedidos() {
 
         const request = {
 
-            // temporalmente fijo hasta construir el selector de clientes
-            clienteId: 1,
+            clienteId: Number(clienteSeleccionado),
 
-            prioridad: "NORMAL",
+            prioridad,
 
-            notas: "",
+            notas,
 
             detalles: pedidoActual.map(item => ({
 
@@ -130,6 +148,8 @@ export default function Pedidos() {
             alert("Pedido registrado correctamente.");
 
             setPedidoActual([]);
+            setNotas("");
+            setPrioridad("NORMAL");
 
             const listaPedidos = await obtenerPedidos();
 
@@ -165,9 +185,88 @@ export default function Pedidos() {
 
                 <h2>Nuevo pedido</h2>
 
+                <div className="controles">
+
+                    <div>
+
+                        <label>Cliente</label>
+
+                        <select
+                            value={clienteSeleccionado}
+                            onChange={(e) =>
+                                setClienteSeleccionado(e.target.value)
+                            }
+                        >
+
+                            <option value="">
+                                Selecciona un cliente
+                            </option>
+
+                            {clientes.map(cliente => (
+
+                                <option
+                                    key={cliente.id}
+                                    value={cliente.id}
+                                >
+
+                                    {cliente.nombre}
+
+                                </option>
+
+                            ))}
+
+                        </select>
+
+                    </div>
+
+                    <div>
+
+                        <label>Prioridad</label>
+
+                        <select
+                            value={prioridad}
+                            onChange={(e) =>
+                                setPrioridad(e.target.value)
+                            }
+                        >
+
+                            <option value="NORMAL">
+
+                                Normal
+
+                            </option>
+
+                            <option value="URGENTE">
+
+                                Urgente
+
+                            </option>
+
+                        </select>
+
+                    </div>
+
+                </div>
+
+                <div style={{ marginTop: "15px" }}>
+
+                    <label>Observaciones</label>
+
+                    <textarea
+                        value={notas}
+                        onChange={(e) =>
+                            setNotas(e.target.value)
+                        }
+                        rows={3}
+                    />
+
+                </div>
+
+                <hr style={{ margin: "20px 0" }} />
+
                 <div className="selector-productos">
 
-                    {productos.map((producto) => (
+                                    {productos.map((producto) => (
 
                         <button
 
@@ -368,11 +467,7 @@ export default function Pedidos() {
 
                 <h2>Pedidos registrados</h2>
 
-                <pre>
-
-                    {JSON.stringify(pedidos, null, 2)}
-
-                </pre>
+                <PedidoTable pedidos={pedidos} />
 
             </section>
 
