@@ -1,0 +1,35 @@
+ALTER TABLE clientes
+ADD COLUMN alias VARCHAR(100);
+
+ALTER TABLE clientes
+ADD COLUMN tipo_cliente VARCHAR(30);
+
+ALTER TABLE clientes
+ADD COLUMN calle VARCHAR(150);
+
+ALTER TABLE clientes
+ADD COLUMN numero_exterior VARCHAR(20);
+
+ALTER TABLE clientes
+ADD COLUMN numero_interior VARCHAR(20);
+
+ALTER TABLE clientes
+ADD COLUMN colonia VARCHAR(120);
+
+ALTER TABLE clientes
+ADD COLUMN localidad VARCHAR(120);
+
+ALTER TABLE clientes
+ADD COLUMN municipio VARCHAR(120);
+
+ALTER TABLE clientes
+ADD COLUMN estado VARCHAR(120);
+
+ALTER TABLE clientes
+ADD COLUMN codigo_postal VARCHAR(10);
+
+ALTER TABLE clientes
+ADD COLUMN referencias VARCHAR(255);
+
+ALTER TABLE clientes
+ADD COLUMN place_id VARCHAR(255);

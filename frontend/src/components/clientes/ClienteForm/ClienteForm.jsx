@@ -1,6 +1,9 @@
 import { useEffect, useState } from "react";
 
-import AddressPicker from "../../maps/AddressPicker";
+import DatosCliente from "./DatosCliente";
+import DireccionCliente from "./DireccionCliente";
+import UbicacionCliente from "./UbicacionCliente";
+import ObservacionesCliente from "./ObservacionesCliente";
 
 import "./ClienteForm.css";
 
@@ -13,12 +16,31 @@ export default function ClienteForm({
 
     const clienteVacio = {
         id: null,
+
         nombre: "",
+        alias: "",
         telefono: "",
+        tipoCliente: "",
+
         direccion: "",
-        observaciones: "",
+
+        calle: "",
+        numeroExterior: "",
+        numeroInterior: "",
+
+        colonia: "",
+        localidad: "",
+        municipio: "",
+        estado: "",
+        codigoPostal: "",
+
+        referencias: "",
+
         latitud: null,
         longitud: null,
+
+        observaciones: "",
+
         activo: true
     };
 
@@ -32,12 +54,31 @@ export default function ClienteForm({
 
             setCliente({
                 id: clienteEditar.id,
+
                 nombre: clienteEditar.nombre || "",
+                alias: clienteEditar.alias || "",
                 telefono: clienteEditar.telefono || "",
+                tipoCliente: clienteEditar.tipoCliente || "",
+
                 direccion: clienteEditar.direccion || "",
-                observaciones: clienteEditar.observaciones || "",
+
+                calle: clienteEditar.calle || "",
+                numeroExterior: clienteEditar.numeroExterior || "",
+                numeroInterior: clienteEditar.numeroInterior || "",
+
+                colonia: clienteEditar.colonia || "",
+                localidad: clienteEditar.localidad || "",
+                municipio: clienteEditar.municipio || "",
+                estado: clienteEditar.estado || "",
+                codigoPostal: clienteEditar.codigoPostal || "",
+
+                referencias: clienteEditar.referencias || "",
+
                 latitud: clienteEditar.latitud,
                 longitud: clienteEditar.longitud,
+
+                observaciones: clienteEditar.observaciones || "",
+
                 activo: clienteEditar.activo ?? true
             });
 
@@ -48,10 +89,6 @@ export default function ClienteForm({
         }
 
     }, [clienteEditar, abierto]);
-
-    if (!abierto) {
-        return null;
-    }
 
     function actualizar(campo, valor) {
 
@@ -66,7 +103,9 @@ export default function ClienteForm({
 
         setCliente(actual => ({
             ...actual,
+
             direccion: datos.texto || "",
+
             latitud: datos.lat,
             longitud: datos.lng
         }));
@@ -81,6 +120,10 @@ export default function ClienteForm({
 
     }
 
+    if (!abierto) {
+        return null;
+    }
+
     return (
 
         <div className="cliente-modal-overlay">
@@ -90,7 +133,9 @@ export default function ClienteForm({
                 <div className="cliente-modal-header">
 
                     <h2>
-                        {cliente.id ? "Editar Cliente" : "Nuevo Cliente"}
+                        {cliente.id
+                            ? "Editar Cliente"
+                            : "Nuevo Cliente"}
                     </h2>
 
                     <button
@@ -104,51 +149,24 @@ export default function ClienteForm({
 
                 <div className="cliente-form">
 
-                    <label>Nombre</label>
-
-                    <input
-                        value={cliente.nombre}
-                        onChange={(e) =>
-                            actualizar("nombre", e.target.value)
-                        }
+                    <DatosCliente
+                        cliente={cliente}
+                        actualizar={actualizar}
                     />
 
-                    <label>Teléfono</label>
-
-                    <input
-                        value={cliente.telefono}
-                        onChange={(e) =>
-                            actualizar("telefono", e.target.value)
-                        }
+                    <DireccionCliente
+                        cliente={cliente}
+                        actualizar={actualizar}
                     />
 
-                    <label>Dirección</label>
-
-                    <input
-                        value={cliente.direccion}
-                        readOnly
+                    <UbicacionCliente
+                        cliente={cliente}
+                        actualizarUbicacion={actualizarUbicacion}
                     />
 
-                    <AddressPicker
-                        value={{
-                            texto: cliente.direccion,
-                            lat: cliente.latitud,
-                            lng: cliente.longitud
-                        }}
-                        onChange={actualizarUbicacion}
-                    />
-
-                    <label>Observaciones</label>
-
-                    <textarea
-                        rows={3}
-                        value={cliente.observaciones}
-                        onChange={(e) =>
-                            actualizar(
-                                "observaciones",
-                                e.target.value
-                            )
-                        }
+                    <ObservacionesCliente
+                        cliente={cliente}
+                        actualizar={actualizar}
                     />
 
                 </div>

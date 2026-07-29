@@ -2,6 +2,7 @@ package mx.agua.backend.service;
 
 import mx.agua.backend.model.Cliente;
 import mx.agua.backend.repository.ClienteRepository;
+import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
@@ -38,11 +39,42 @@ public class ClienteService {
         Cliente cliente = repository.findById(id)
                 .orElseThrow(() -> new RuntimeException("Cliente no encontrado"));
 
+        // ==========================
+        // Datos personales
+        // ==========================
+
         cliente.setNombre(datos.getNombre());
+        cliente.setAlias(datos.getAlias());
         cliente.setTelefono(datos.getTelefono());
+        cliente.setTipoCliente(datos.getTipoCliente());
+
+        // ==========================
+        // Dirección
+        // ==========================
+
         cliente.setDireccion(datos.getDireccion());
+        cliente.setCalle(datos.getCalle());
+        cliente.setNumeroExterior(datos.getNumeroExterior());
+        cliente.setNumeroInterior(datos.getNumeroInterior());
+        cliente.setColonia(datos.getColonia());
+        cliente.setLocalidad(datos.getLocalidad());
+        cliente.setMunicipio(datos.getMunicipio());
+        cliente.setEstado(datos.getEstado());
+        cliente.setCodigoPostal(datos.getCodigoPostal());
+        cliente.setReferencias(datos.getReferencias());
+
+        // ==========================
+        // Ubicación
+        // ==========================
+
+        cliente.setPlaceId(datos.getPlaceId());
         cliente.setLatitud(datos.getLatitud());
         cliente.setLongitud(datos.getLongitud());
+
+        // ==========================
+        // Otros
+        // ==========================
+
         cliente.setObservaciones(datos.getObservaciones());
         cliente.setActivo(datos.getActivo());
 
@@ -54,6 +86,8 @@ public class ClienteService {
         Cliente cliente = repository.findById(id)
                 .orElseThrow(() -> new RuntimeException("Cliente no encontrado"));
 
+        cliente.setDireccion(datos.getDireccion());
+        cliente.setPlaceId(datos.getPlaceId());
         cliente.setLatitud(datos.getLatitud());
         cliente.setLongitud(datos.getLongitud());
 
@@ -66,7 +100,18 @@ public class ClienteService {
             throw new RuntimeException("Cliente no encontrado");
         }
 
-        repository.deleteById(id);
+        try {
+
+            repository.deleteById(id);
+
+        } catch (DataIntegrityViolationException ex) {
+
+            throw new RuntimeException(
+                    "No se puede eliminar este cliente porque tiene pedidos registrados."
+            );
+
+        }
+
     }
 
 }

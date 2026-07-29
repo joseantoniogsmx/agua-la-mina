@@ -15,15 +15,10 @@ import "./Clientes.css";
 export default function Clientes() {
 
     const [clientes, setClientes] = useState([]);
-
     const [busqueda, setBusqueda] = useState("");
-
     const [mostrarModal, setMostrarModal] = useState(false);
-
     const [clienteEditar, setClienteEditar] = useState(null);
-
     const [mostrarEliminar, setMostrarEliminar] = useState(false);
-
     const [clienteEliminar, setClienteEliminar] = useState(null);
 
     useEffect(() => {
@@ -51,17 +46,12 @@ export default function Clientes() {
         try {
 
             if (cliente.id) {
-
                 await actualizarCliente(cliente.id, cliente);
-
             } else {
-
                 await crearCliente(cliente);
-
             }
 
             setMostrarModal(false);
-
             setClienteEditar(null);
 
             await cargarClientes();
@@ -70,7 +60,10 @@ export default function Clientes() {
 
             console.error(error);
 
-            alert("No fue posible guardar el cliente.");
+            alert(
+                error?.response?.data ||
+                "No fue posible guardar el cliente."
+            );
 
         }
 
@@ -99,7 +92,6 @@ export default function Clientes() {
             await eliminarCliente(clienteEliminar.id);
 
             setMostrarEliminar(false);
-
             setClienteEliminar(null);
 
             await cargarClientes();
@@ -108,7 +100,10 @@ export default function Clientes() {
 
             console.error(error);
 
-            alert("No fue posible eliminar el cliente.");
+            alert(
+                error?.response?.data ||
+                "No fue posible eliminar el cliente."
+            );
 
         }
 
@@ -130,7 +125,11 @@ export default function Clientes() {
 
         return clientes.filter(cliente =>
 
-            cliente.nombre.toLowerCase().includes(filtro)
+            cliente.nombre?.toLowerCase().includes(filtro)
+
+            ||
+
+            cliente.alias?.toLowerCase().includes(filtro)
 
             ||
 
@@ -143,6 +142,26 @@ export default function Clientes() {
         );
 
     }, [clientes, busqueda]);
+
+    function direccionCorta(cliente) {
+
+        const partes = [];
+
+        if (cliente.calle)
+            partes.push(cliente.calle);
+
+        if (cliente.numeroExterior)
+            partes.push(cliente.numeroExterior);
+
+        if (cliente.colonia)
+            partes.push(cliente.colonia);
+
+        if (partes.length > 0)
+            return partes.join(", ");
+
+        return cliente.direccion || "Sin dirección";
+
+    }
 
     return (
 
@@ -197,11 +216,38 @@ export default function Clientes() {
                             className="cliente-card"
                         >
 
-                            <h3>{cliente.nombre}</h3>
+                            <h3>
+                                {cliente.nombre}
+                            </h3>
 
-                            <p>📞 {cliente.telefono}</p>
+                            {
+                                cliente.alias &&
+                                <p>🏷️ {cliente.alias}</p>
+                            }
 
-                            <p>📍 {cliente.direccion}</p>
+                            {
+                                cliente.tipoCliente &&
+                                <p>👤 {cliente.tipoCliente}</p>
+                            }
+
+                            <p>
+                                📞 {cliente.telefono}
+                            </p>
+
+                            <p>
+                                📍 {direccionCorta(cliente)}
+                            </p>
+
+                            {
+                                (cliente.municipio || cliente.estado) &&
+
+                                <p>
+                                    🗺️ {cliente.municipio}
+                                    {cliente.municipio && cliente.estado ? ", " : ""}
+                                    {cliente.estado}
+                                </p>
+
+                            }
 
                             <div className="cliente-acciones">
 
