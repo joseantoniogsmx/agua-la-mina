@@ -1,6 +1,14 @@
 import { useEffect, useMemo, useState } from "react";
 
-import { buscarClientes } from "../../services/clienteService";
+import {
+    buscarClientes,
+    crearCliente,
+    actualizarCliente,
+    eliminarCliente
+} from "../../services/clienteService";
+
+import ClienteForm from "../../components/clientes/ClienteForm/ClienteForm";
+import ConfirmDialog from "../../components/common/ConfirmDialog/ConfirmDialog";
 
 import "./Clientes.css";
 
@@ -10,17 +18,23 @@ export default function Clientes() {
 
     const [busqueda, setBusqueda] = useState("");
 
+    const [mostrarModal, setMostrarModal] = useState(false);
+
+    const [clienteEditar, setClienteEditar] = useState(null);
+
+    const [mostrarEliminar, setMostrarEliminar] = useState(false);
+
+    const [clienteEliminar, setClienteEliminar] = useState(null);
+
     useEffect(() => {
-
-        cargarClientes("");
-
+        cargarClientes();
     }, []);
 
-    async function cargarClientes(texto) {
+    async function cargarClientes() {
 
         try {
 
-            const datos = await buscarClientes(texto);
+            const datos = await buscarClientes("");
 
             setClientes(datos);
 
@@ -29,6 +43,82 @@ export default function Clientes() {
             console.error(error);
 
         }
+
+    }
+
+    async function guardarCliente(cliente) {
+
+        try {
+
+            if (cliente.id) {
+
+                await actualizarCliente(cliente.id, cliente);
+
+            } else {
+
+                await crearCliente(cliente);
+
+            }
+
+            setMostrarModal(false);
+
+            setClienteEditar(null);
+
+            await cargarClientes();
+
+        } catch (error) {
+
+            console.error(error);
+
+            alert("No fue posible guardar el cliente.");
+
+        }
+
+    }
+
+    function editarCliente(cliente) {
+
+        setClienteEditar(cliente);
+
+        setMostrarModal(true);
+
+    }
+
+    function solicitarEliminar(cliente) {
+
+        setClienteEliminar(cliente);
+
+        setMostrarEliminar(true);
+
+    }
+
+    async function confirmarEliminar() {
+
+        try {
+
+            await eliminarCliente(clienteEliminar.id);
+
+            setMostrarEliminar(false);
+
+            setClienteEliminar(null);
+
+            await cargarClientes();
+
+        } catch (error) {
+
+            console.error(error);
+
+            alert("No fue posible eliminar el cliente.");
+
+        }
+
+    }
+
+    function cancelarEliminar() {
+
+        setMostrarEliminar(false);
+
+        setClienteEliminar(null);
 
     }
 
@@ -68,10 +158,17 @@ export default function Clientes() {
 
                 </div>
 
-                <button className="btn-primary">
+                <button
+                    className="btn-primary"
+                    onClick={() => {
 
+                        setClienteEditar(null);
+
+                        setMostrarModal(true);
+
+                    }}
+                >
                     + Nuevo cliente
-
                 </button>
 
             </div>
@@ -79,17 +176,12 @@ export default function Clientes() {
             <div className="clientes-toolbar">
 
                 <input
-
                     className="buscador"
-
                     placeholder="Buscar cliente..."
-
                     value={busqueda}
-
                     onChange={(e) =>
                         setBusqueda(e.target.value)
                     }
-
                 />
 
             </div>
@@ -101,30 +193,33 @@ export default function Clientes() {
                     clientesFiltrados.map(cliente => (
 
                         <div
-
                             key={cliente.id}
-
                             className="cliente-card"
-
                         >
 
-                            <h3>
+                            <h3>{cliente.nombre}</h3>
 
-                                {cliente.nombre}
+                            <p>📞 {cliente.telefono}</p>
 
-                            </h3>
+                            <p>📍 {cliente.direccion}</p>
 
-                            <p>
+                            <div className="cliente-acciones">
 
-                                📞 {cliente.telefono}
+                                <button
+                                    className="btn-secondary"
+                                    onClick={() => editarCliente(cliente)}
+                                >
+                                    ✏ Editar
+                                </button>
 
-                            </p>
+                                <button
+                                    className="btn-danger"
+                                    onClick={() => solicitarEliminar(cliente)}
+                                >
+                                    🗑 Eliminar
+                                </button>
 
-                            <p>
-
-                                📍 {cliente.direccion}
-
-                            </p>
+                            </div>
 
                         </div>
 
@@ -133,6 +228,42 @@ export default function Clientes() {
                 }
 
             </div>
+
+            <ClienteForm
+
+                abierto={mostrarModal}
+
+                clienteEditar={clienteEditar}
+
+                onCerrar={() => {
+
+                    setMostrarModal(false);
+
+                    setClienteEditar(null);
+
+                }}
+
+                onGuardar={guardarCliente}
+
+            />
+
+            <ConfirmDialog
+
+                abierto={mostrarEliminar}
+
+                titulo="Eliminar cliente"
+
+                mensaje={
+                    clienteEliminar
+                        ? `¿Desea eliminar a ${clienteEliminar.nombre}?`
+                        : ""
+                }
+
+                onCancelar={cancelarEliminar}
+
+                onConfirmar={confirmarEliminar}
+
+            />
 
         </div>
 

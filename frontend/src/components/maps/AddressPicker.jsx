@@ -1,133 +1,158 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
+import AddressSearch from "./AddressSearch";
+import GoogleMapView from "./GoogleMapView";
+import "./AddressPicker.css";
 
-import {
-    MapContainer,
-    TileLayer,
-    Marker,
-    useMapEvents
-} from "react-leaflet";
+export default function AddressPicker({
+    value = null,
+    onChange
+}) {
 
-import L from "leaflet";
+    const defaultCenter = {
+        lat: 19.432608,
+        lng: -99.133209
+    };
 
-import "leaflet/dist/leaflet.css";
+    const [direccion, setDireccion] = useState(value);
 
-const icono = new L.Icon({
+    useEffect(() => {
+        setDireccion(value);
+    }, [value]);
 
-    iconUrl:
-        "https://unpkg.com/leaflet@1.9.4/dist/images/marker-icon.png",
+    const coordenadasValidas =
+        direccion &&
+        typeof direccion.lat === "number" &&
+        Number.isFinite(direccion.lat) &&
+        typeof direccion.lng === "number" &&
+        Number.isFinite(direccion.lng);
 
-    shadowUrl:
-        "https://unpkg.com/leaflet@1.9.4/dist/images/marker-shadow.png",
+    function seleccionarDireccion(datos) {
 
-    iconSize: [25, 41],
-
-    iconAnchor: [12, 41]
-
-});
-
-function Selector({ posicion, setPosicion }) {
-
-    useMapEvents({
-
-        click(e) {
-
-            setPosicion(e.latlng);
-
-        }
-
-    });
-
-    return posicion ? (
-
-        <Marker
-
-            position={posicion}
-
-            icon={icono}
-
-            draggable={true}
-
-            eventHandlers={{
-
-                dragend(e) {
-
-                    setPosicion(e.target.getLatLng());
-
-                }
-
-            }}
-
-        />
-
-    ) : null;
-
-}
-
-export default function AddressPicker({ onChange }) {
-
-    const [posicion, setPosicion] = useState({
-
-        lat: 19.290,
-
-        lng: -99.170
-
-    });
-
-    function actualizar(pos) {
-
-        setPosicion(pos);
+        setDireccion(datos);
 
         if (onChange) {
+            onChange(datos);
+        }
 
-            onChange({
+    }
 
-                latitud: pos.lat,
+    function moverMarcador(posicion) {
 
-                longitud: pos.lng
+        if (!direccion) {
 
-            });
+            const nuevaDireccion = {
+                texto: "",
+                nombre: "",
+                ciudad: "",
+                estado: "",
+                codigoPostal: "",
+                placeId: "",
+                lat: posicion.lat,
+                lng: posicion.lng
+            };
+
+            setDireccion(nuevaDireccion);
+
+            onChange?.(nuevaDireccion);
+
+            return;
 
         }
+
+        const actualizada = {
+            ...direccion,
+            lat: posicion.lat,
+            lng: posicion.lng
+        };
+
+        setDireccion(actualizada);
+
+        onChange?.(actualizada);
 
     }
 
     return (
 
-        <MapContainer
+        <div className="address-picker">
 
-            center={posicion}
+            <AddressSearch
+                placeholder="Buscar dirección..."
+                onSelect={seleccionarDireccion}
+            />
 
-            zoom={15}
+            <GoogleMapView
 
-            style={{
+                center={
+                    coordenadasValidas
+                        ? {
+                              lat: direccion.lat,
+                              lng: direccion.lng
+                          }
+                        : defaultCenter
+                }
 
-                height: "420px",
+                markerPosition={
+                    coordenadasValidas
+                        ? {
+                              lat: direccion.lat,
+                              lng: direccion.lng
+                          }
+                        : null
+                }
 
-                width: "100%",
-
-                borderRadius: "12px"
-
-            }}
-
-        >
-
-            <TileLayer
-
-                attribution='&copy; OpenStreetMap'
-
-                url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
+                onMapClick={moverMarcador}
 
             />
 
-            <Selector
+            {
 
-                posicion={posicion}
+                direccion && (
 
-                setPosicion={actualizar}
+                    <div className="address-summary">
 
-            />
+                        <h4>Dirección seleccionada</h4>
 
-        </MapContainer>
+                        <p>
+                            <strong>Dirección:</strong>{" "}
+                            {direccion.texto || "No disponible"}
+                        </p>
+
+                        <p>
+                            <strong>Ciudad:</strong>{" "}
+                            {direccion.ciudad || "-"}
+                        </p>
+
+                        <p>
+                            <strong>Estado:</strong>{" "}
+                            {direccion.estado || "-"}
+                        </p>
+
+                        <p>
+                            <strong>Código Postal:</strong>{" "}
+                            {direccion.codigoPostal || "-"}
+                        </p>
+
+                        <p>
+                            <strong>Latitud:</strong>{" "}
+                            {coordenadasValidas
+                                ? direccion.lat.toFixed(6)
+                                : "-"}
+                        </p>
+
+                        <p>
+                            <strong>Longitud:</strong>{" "}
+                            {coordenadasValidas
+                                ? direccion.lng.toFixed(6)
+                                : "-"}
+                        </p>
+
+                    </div>
+
+                )
+
+            }
+
+        </div>
 
     );
 

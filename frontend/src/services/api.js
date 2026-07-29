@@ -1,67 +1,46 @@
-const API = import.meta.env.VITE_API_URL;
+const API_URL = "http://localhost:8080";
 
-export async function get(endpoint) {
+async function request(url, options = {}) {
 
-    const response = await fetch(`${API}${endpoint}`);
+    const response = await fetch(`${API_URL}${url}`, {
+        headers: {
+            "Content-Type": "application/json",
+            ...(options.headers || {})
+        },
+        ...options
+    });
 
     if (!response.ok) {
+        throw new Error(`Error ${response.status}`);
+    }
 
-        throw new Error("Error al consultar el servidor.");
-
+    if (response.status === 204) {
+        return null;
     }
 
     return await response.json();
-
 }
 
-export async function post(endpoint, body) {
+export function get(url) {
+    return request(url);
+}
 
-    const response = await fetch(`${API}${endpoint}`, {
-
+export function post(url, data) {
+    return request(url, {
         method: "POST",
-
-        headers: {
-
-            "Content-Type": "application/json"
-
-        },
-
-        body: JSON.stringify(body)
-
+        body: JSON.stringify(data)
     });
-
-    if (!response.ok) {
-
-        throw new Error("Error al enviar información.");
-
-    }
-
-    return await response.json();
-
 }
 
-export async function put(endpoint, body) {
-
-    const response = await fetch(`${API}${endpoint}`, {
-
+export function put(url, data) {
+    return request(url, {
         method: "PUT",
-
-        headers: {
-
-            "Content-Type": "application/json"
-
-        },
-
-        body: JSON.stringify(body)
-
+        body: JSON.stringify(data)
     });
+}
 
-    if (!response.ok) {
-
-        throw new Error("Error al actualizar información.");
-
-    }
-
-    return await response.json();
-
+export function del(url) {
+    return request(url, {
+        method: "DELETE"
+    });
 }

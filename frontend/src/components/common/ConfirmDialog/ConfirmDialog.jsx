@@ -1,57 +1,39 @@
 import "./ConfirmDialog.css";
 
 export default function ConfirmDialog({
-
-    open,
-
-    title,
-
-    message,
-
-    onConfirm,
-
-    onCancel
-
+    abierto,
+    titulo,
+    mensaje,
+    onCancelar,
+    onConfirmar
 }) {
 
-    if (!open) return null;
+    if (!abierto) return null;
 
     return (
 
-        <div className="dialog-overlay">
+        <div className="confirm-overlay">
 
-            <div className="dialog">
+            <div className="confirm-dialog">
 
-                <h2>
+                <h2>{titulo}</h2>
 
-                    {title}
+                <p>{mensaje}</p>
 
-                </h2>
-
-                <p>
-
-                    {message}
-
-                </p>
-
-                <div className="dialog-buttons">
+                <div className="confirm-buttons">
 
                     <button
-                        className="dialog-cancel"
-                        onClick={onCancel}
+                        className="btn-secondary"
+                        onClick={onCancelar}
                     >
-
                         Cancelar
-
                     </button>
 
                     <button
-                        className="dialog-confirm"
-                        onClick={onConfirm}
+                        className="btn-danger"
+                        onClick={onConfirmar}
                     >
-
-                        Confirmar
-
+                        Eliminar
                     </button>
 
                 </div>
