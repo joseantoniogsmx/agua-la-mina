@@ -14,10 +14,10 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
-import java.util.stream.Collectors;
 
 @RestController
 @RequestMapping("/pedidos")
+@CrossOrigin(origins = "*")
 public class PedidoController {
 
     private final PedidoRepository pedidoRepository;
@@ -32,7 +32,6 @@ public class PedidoController {
         this.pedidoRepository = pedidoRepository;
         this.rutaService = rutaService;
         this.pedidoV2Service = pedidoV2Service;
-
     }
 
     @GetMapping
@@ -41,7 +40,7 @@ public class PedidoController {
         return pedidoRepository.findAll()
                 .stream()
                 .map(this::convertirPedido)
-                .collect(Collectors.toList());
+                .toList();
 
     }
 
@@ -51,7 +50,7 @@ public class PedidoController {
         return pedidoRepository.findByEstado(PedidoEstado.PENDIENTE)
                 .stream()
                 .map(this::convertirPedido)
-                .collect(Collectors.toList());
+                .toList();
 
     }
 
@@ -90,12 +89,6 @@ public class PedidoController {
 
     }
 
-    /*
-     * ======================================
-     * Conversores Entity -> DTO
-     * ======================================
-     */
-
     private PedidoResponse convertirPedido(Pedido pedido) {
 
         PedidoResponse response = new PedidoResponse();
@@ -121,51 +114,37 @@ public class PedidoController {
         if (pedido.getCliente() != null) {
 
             response.setCliente(
-
                     new ClienteResponse(
-
                             pedido.getCliente().getId(),
-
                             pedido.getCliente().getNombre()
-
                     )
-
             );
 
         }
 
         response.setDetalles(
-
                 pedido.getDetalles()
-
                         .stream()
-
                         .map(this::convertirDetalle)
-
-                        .collect(Collectors.toList())
-
+                        .toList()
         );
 
         return response;
 
     }
-        private DetallePedidoResponse convertirDetalle(
+
+    private DetallePedidoResponse convertirDetalle(
             DetallePedido detalle) {
 
-        DetallePedidoResponse response =
-                new DetallePedidoResponse();
+        DetallePedidoResponse response = new DetallePedidoResponse();
 
         response.setId(detalle.getId());
 
         if (detalle.getProducto() != null) {
 
-            response.setProductoId(
-                    detalle.getProducto().getId()
-            );
+            response.setProductoId(detalle.getProducto().getId());
 
-            response.setMarca(
-                    detalle.getProducto().getMarca()
-            );
+            response.setMarca(detalle.getProducto().getMarca());
 
             response.setCapacidadLitros(
                     detalle.getProducto().getCapacidadLitros()
@@ -173,21 +152,13 @@ public class PedidoController {
 
         }
 
-        response.setCantidad(
-                detalle.getCantidad()
-        );
+        response.setCantidad(detalle.getCantidad());
 
-        response.setPrestados(
-                detalle.getPrestados()
-        );
+        response.setPrestados(detalle.getPrestados());
 
-        response.setPrecioUnitario(
-                detalle.getPrecioUnitario()
-        );
+        response.setPrecioUnitario(detalle.getPrecioUnitario());
 
-        response.setSubtotal(
-                detalle.getSubtotal()
-        );
+        response.setSubtotal(detalle.getSubtotal());
 
         return response;
 

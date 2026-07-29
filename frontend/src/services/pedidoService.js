@@ -14,27 +14,13 @@ export async function obtenerPedidos() {
 
 /*
  * ============================
- * MODELO ANTIGUO
- * (Se conservará temporalmente)
+ * PEDIDOS
  * ============================
  */
 
 export async function crearPedido(pedido) {
 
     return await post("/pedidos", pedido);
-
-}
-
-/*
- * ============================
- * NUEVO MODELO
- * (Pedido con múltiples productos)
- * ============================
- */
-
-export async function crearPedidoV2(pedido) {
-
-    return await post("/pedidos/v2", pedido);
 
 }
 

@@ -1,7 +1,6 @@
 package mx.agua.backend.model;
 
 import jakarta.persistence.*;
-
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
@@ -15,28 +14,10 @@ public class Pedido {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Integer id;
 
-    @ManyToOne
-    @JoinColumn(name = "cliente_id")
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "cliente_id", nullable = false)
     private Cliente cliente;
 
-    /*
-     * MODELO ANTIGUO
-     * Se mantiene temporalmente para no romper el sistema
-     * mientras migramos completamente a DetallePedido.
-     */
-    @ManyToOne
-    @JoinColumn(name = "producto_id")
-    private Producto producto;
-
-    private Integer cantidad;
-
-    private BigDecimal total;
-
-    private Integer prestados;
-
-    /*
-     * MODELO NUEVO
-     */
     @OneToMany(
             mappedBy = "pedido",
             cascade = CascadeType.ALL,
@@ -44,16 +25,23 @@ public class Pedido {
     )
     private List<DetallePedido> detalles = new ArrayList<>();
 
+    @Column(nullable = false, precision = 10, scale = 2)
+    private BigDecimal total = BigDecimal.ZERO;
+
+    @Column(length = 20)
     private String prioridad;
 
     @Enumerated(EnumType.STRING)
+    @Column(nullable = false, length = 20)
     private PedidoEstado estado;
 
     @Column(name = "orden_ruta")
     private Integer ordenRuta;
 
+    @Column(nullable = false)
     private LocalDateTime fecha;
 
+    @Column(length = 50)
     private String origen;
 
     @Column(columnDefinition = "TEXT")
@@ -73,33 +61,24 @@ public class Pedido {
             estado = PedidoEstado.PENDIENTE;
         }
 
-        if (prioridad == null) {
-            prioridad = "NORMAL";
-        }
-
-        if (origen == null) {
-            origen = "CAJERO";
+        if (total == null) {
+            total = BigDecimal.ZERO;
         }
 
     }
 
-    /**
-     * Mantiene sincronizada la relación bidireccional
-     * entre Pedido y DetallePedido.
-     */
     public void agregarDetalle(DetallePedido detalle) {
 
-        detalles.add(detalle);
         detalle.setPedido(this);
+
+        detalles.add(detalle);
 
     }
 
-    /**
-     * Elimina un detalle del pedido.
-     */
     public void eliminarDetalle(DetallePedido detalle) {
 
         detalles.remove(detalle);
+
         detalle.setPedido(null);
 
     }
@@ -120,20 +99,12 @@ public class Pedido {
         this.cliente = cliente;
     }
 
-    public Producto getProducto() {
-        return producto;
+    public List<DetallePedido> getDetalles() {
+        return detalles;
     }
 
-    public void setProducto(Producto producto) {
-        this.producto = producto;
-    }
-
-    public Integer getCantidad() {
-        return cantidad;
-    }
-
-    public void setCantidad(Integer cantidad) {
-        this.cantidad = cantidad;
+    public void setDetalles(List<DetallePedido> detalles) {
+        this.detalles = detalles;
     }
 
     public BigDecimal getTotal() {
@@ -142,22 +113,6 @@ public class Pedido {
 
     public void setTotal(BigDecimal total) {
         this.total = total;
-    }
-
-    public Integer getPrestados() {
-        return prestados;
-    }
-
-    public void setPrestados(Integer prestados) {
-        this.prestados = prestados;
-    }
-
-    public List<DetallePedido> getDetalles() {
-        return detalles;
-    }
-
-    public void setDetalles(List<DetallePedido> detalles) {
-        this.detalles = detalles;
     }
 
     public String getPrioridad() {

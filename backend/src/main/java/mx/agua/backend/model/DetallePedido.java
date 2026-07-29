@@ -12,24 +12,47 @@ public class DetallePedido {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Integer id;
 
-    @ManyToOne
-    @JoinColumn(name = "pedido_id")
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "pedido_id", nullable = false)
     private Pedido pedido;
 
-    @ManyToOne
-    @JoinColumn(name = "producto_id")
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "producto_id", nullable = false)
     private Producto producto;
 
+    @Column(nullable = false)
     private Integer cantidad;
 
+    @Column(nullable = false)
     private Integer prestados;
 
-    @Column(name = "precio_unitario")
+    @Column(name = "precio_unitario", nullable = false, precision = 10, scale = 2)
     private BigDecimal precioUnitario;
 
+    @Column(nullable = false, precision = 10, scale = 2)
     private BigDecimal subtotal;
 
     public DetallePedido() {
+    }
+
+    @PrePersist
+    @PreUpdate
+    public void calcularSubtotal() {
+
+        if (cantidad == null) {
+            cantidad = 0;
+        }
+
+        if (precioUnitario == null) {
+            precioUnitario = BigDecimal.ZERO;
+        }
+
+        subtotal = precioUnitario.multiply(BigDecimal.valueOf(cantidad));
+
+        if (prestados == null) {
+            prestados = 0;
+        }
+
     }
 
     public Integer getId() {
@@ -87,4 +110,5 @@ public class DetallePedido {
     public void setSubtotal(BigDecimal subtotal) {
         this.subtotal = subtotal;
     }
+
 }

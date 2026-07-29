@@ -1,13 +1,14 @@
-import { useEffect, useMemo, useState } from "react";
+import { useEffect, useState } from "react";
 
 import {
     obtenerPedidos,
-    crearPedidoV2
+    crearPedido
 } from "../../services/pedidoService";
 
 import { obtenerProductos } from "../../services/productoService";
 import { obtenerClientes } from "../../services/clienteService";
 
+import PedidoForm from "../../components/pedidos/PedidoForm/PedidoForm";
 import PedidoTable from "../../components/pedidos/PedidoTable/PedidoTable";
 
 import "./Pedidos.css";
@@ -15,151 +16,90 @@ import "./Pedidos.css";
 export default function Pedidos() {
 
     const [pedidos, setPedidos] = useState([]);
+
     const [productos, setProductos] = useState([]);
+
     const [clientes, setClientes] = useState([]);
 
-    const [clienteSeleccionado, setClienteSeleccionado] = useState("");
-
-    const [prioridad, setPrioridad] = useState("NORMAL");
-    const [notas, setNotas] = useState("");
-
-    const [productoSeleccionado, setProductoSeleccionado] = useState(null);
-
-    const [cantidad, setCantidad] = useState(1);
-
-    const [prestados, setPrestados] = useState(0);
-
-    const [pedidoActual, setPedidoActual] = useState([]);
+    const [cargando, setCargando] = useState(true);
 
     useEffect(() => {
 
-        async function cargar() {
-
-            try {
-
-                const listaPedidos = await obtenerPedidos();
-                const listaProductos = await obtenerProductos();
-                const listaClientes = await obtenerClientes();
-
-                setPedidos(listaPedidos);
-                setProductos(listaProductos);
-                setClientes(listaClientes);
-
-            } catch (error) {
-
-                console.error(error);
-
-            }
-
-        }
-
-        cargar();
+        cargarInformacion();
 
     }, []);
 
-    function agregarProducto() {
-
-        if (!productoSeleccionado) return;
-
-        const subtotal =
-            productoSeleccionado.precio * cantidad;
-
-        setPedidoActual([
-            ...pedidoActual,
-            {
-                producto: productoSeleccionado,
-                cantidad,
-                prestados,
-                subtotal
-            }
-        ]);
-
-        setCantidad(1);
-        setPrestados(0);
-        setProductoSeleccionado(null);
-
-    }
-
-    function eliminarLinea(index) {
-
-        setPedidoActual(
-            pedidoActual.filter((_, i) => i !== index)
-        );
-
-    }
-
-    function vaciarPedido() {
-
-        setPedidoActual([]);
-
-    }
-
-    const totalPedido = useMemo(() => {
-
-        return pedidoActual.reduce(
-            (total, item) => total + item.subtotal,
-            0
-        );
-
-    }, [pedidoActual]);
-
-    async function guardarPedido() {
-
-        if (!clienteSeleccionado) {
-
-            alert("Selecciona un cliente.");
-
-            return;
-
-        }
-
-        if (pedidoActual.length === 0) {
-
-            alert("Agrega al menos un producto.");
-
-            return;
-
-        }
-
-        const request = {
-
-            clienteId: Number(clienteSeleccionado),
-
-            prioridad,
-
-            notas,
-
-            detalles: pedidoActual.map(item => ({
-
-                productoId: item.producto.id,
-
-                cantidad: item.cantidad,
-
-                prestados: item.prestados
-
-            }))
-
-        };
+    async function cargarInformacion() {
 
         try {
 
-            await crearPedidoV2(request);
+            setCargando(true);
 
-            alert("Pedido registrado correctamente.");
+            const [
 
-            setPedidoActual([]);
-            setNotas("");
-            setPrioridad("NORMAL");
+                listaPedidos,
 
-            const listaPedidos = await obtenerPedidos();
+                listaProductos,
+
+                listaClientes
+
+            ] = await Promise.all([
+
+                obtenerPedidos(),
+
+                obtenerProductos(),
+
+                obtenerClientes()
+
+            ]);
 
             setPedidos(listaPedidos);
+
+            setProductos(listaProductos);
+
+            setClientes(listaClientes);
 
         } catch (error) {
 
             console.error(error);
 
-            alert("No fue posible guardar el pedido.");
+            alert("No fue posible cargar la información.");
+
+        } finally {
+
+            setCargando(false);
+
+        }
+
+    }
+
+    async function guardarPedido(request) {
+
+        try {
+
+            await crearPedido(request);
+
+            alert("Pedido registrado correctamente.");
+
+            await cargarInformacion();
+
+        } catch (error) {
+
+            console.error(error);
+
+            alert(
+
+                error?.response?.data?.message ||
+
+                error?.response?.data ||
+
+                error.message ||
+
+                "No fue posible guardar el pedido."
+
+            );
+
+            throw error;
 
         }
 
@@ -181,293 +121,37 @@ export default function Pedidos() {
 
             </div>
 
-            <section className="nuevo-pedido">
+            <PedidoForm
 
-                <h2>Nuevo pedido</h2>
+                clientes={clientes}
 
-                <div className="controles">
+                productos={productos}
 
-                    <div>
+                onGuardar={guardarPedido}
 
-                        <label>Cliente</label>
+            />
 
-                        <select
-                            value={clienteSeleccionado}
-                            onChange={(e) =>
-                                setClienteSeleccionado(e.target.value)
-                            }
-                        >
-
-                            <option value="">
-                                Selecciona un cliente
-                            </option>
-
-                            {clientes.map(cliente => (
-
-                                <option
-                                    key={cliente.id}
-                                    value={cliente.id}
-                                >
-
-                                    {cliente.nombre}
-
-                                </option>
-
-                            ))}
-
-                        </select>
-
-                    </div>
-
-                    <div>
-
-                        <label>Prioridad</label>
-
-                        <select
-                            value={prioridad}
-                            onChange={(e) =>
-                                setPrioridad(e.target.value)
-                            }
-                        >
-
-                            <option value="NORMAL">
-
-                                Normal
-
-                            </option>
-
-                            <option value="URGENTE">
-
-                                Urgente
-
-                            </option>
-
-                        </select>
-
-                    </div>
-
-                </div>
-
-                <div style={{ marginTop: "15px" }}>
-
-                    <label>Observaciones</label>
-
-                    <textarea
-                        value={notas}
-                        onChange={(e) =>
-                            setNotas(e.target.value)
-                        }
-                        rows={3}
-                    />
-
-                </div>
-
-                <hr style={{ margin: "20px 0" }} />
-
-                <div className="selector-productos">
-
-                                    {productos.map((producto) => (
-
-                        <button
-
-                            key={producto.id}
-
-                            className={
-                                productoSeleccionado?.id === producto.id
-                                    ? "producto seleccionado"
-                                    : "producto"
-                            }
-
-                            style={{
-                                borderColor: producto.colorPrincipal
-                            }}
-
-                            onClick={() =>
-                                setProductoSeleccionado(producto)
-                            }
-
-                        >
-
-                            <img
-                                src={`/productos/${producto.imagen}`}
-                                alt={producto.marca}
-                            />
-
-                            <strong>
-
-                                {producto.marca}
-
-                            </strong>
-
-                            <span>
-
-                                ${producto.precio}
-
-                            </span>
-
-                        </button>
-
-                    ))}
-
-                </div>
-
-                <div className="controles">
-
-                    <div>
-
-                        <label>Cantidad</label>
-
-                        <input
-
-                            type="number"
-
-                            min="1"
-
-                            value={cantidad}
-
-                            onChange={(e) =>
-                                setCantidad(Number(e.target.value))
-                            }
-
-                        />
-
-                    </div>
-
-                    <div>
-
-                        <label>Prestados</label>
-
-                        <input
-
-                            type="number"
-
-                            min="0"
-
-                            value={prestados}
-
-                            onChange={(e) =>
-                                setPrestados(Number(e.target.value))
-                            }
-
-                        />
-
-                    </div>
-
-                </div>
-
-                <button
-                    className="btn-primary"
-                    onClick={agregarProducto}
-                >
-
-                    + Agregar al pedido
-
-                </button>
-
-            </section>
-
-            <section className="pedido-actual">
-
-                <h2>Pedido actual</h2>
-
-                {
-
-                    pedidoActual.length === 0
-
-                        ?
-
-                        <p>No hay productos agregados.</p>
-
-                        :
-
-                        pedidoActual.map((item, index) => (
-
-                            <div
-                                key={index}
-                                className="linea-pedido"
-                            >
-
-                                <strong>
-
-                                    {item.producto.marca}
-
-                                </strong>
-
-                                <span>
-
-                                    Cantidad: {item.cantidad}
-
-                                </span>
-
-                                <span>
-
-                                    Prestados: {item.prestados}
-
-                                </span>
-
-                                <span>
-
-                                    ${item.subtotal.toFixed(2)}
-
-                                </span>
-
-                                <button
-                                    onClick={() => eliminarLinea(index)}
-                                >
-
-                                    ❌
-
-                                </button>
-
-                            </div>
-
-                        ))
-
-                }
-
-                <hr />
-
-                <h3>
-
-                    Total: ${totalPedido.toFixed(2)}
-
-                </h3>
-
-                <div
-                    style={{
-                        display: "flex",
-                        gap: "12px",
-                        marginTop: "15px"
-                    }}
-                >
-
-                    <button
-                        className="btn-primary"
-                        onClick={guardarPedido}
-                    >
-
-                        Guardar pedido
-
-                    </button>
-
-                    <button
-                        className="btn-secondary"
-                        onClick={vaciarPedido}
-                    >
-
-                        Vaciar pedido
-
-                    </button>
-
-                </div>
-
-            </section>
-
-            <section>
+            <section className="pedidos-lista">
 
                 <h2>Pedidos registrados</h2>
 
-                <PedidoTable pedidos={pedidos} />
+                {
+
+                    cargando
+
+                        ?
+
+                        <p>Cargando pedidos...</p>
+
+                        :
+
+                        <PedidoTable
+
+                            pedidos={pedidos}
+
+                        />
+
+                }
 
             </section>
 
