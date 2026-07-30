@@ -1,10 +1,14 @@
-import { get, post, put } from "./api";
+import {
 
-/*
- * ============================
- * CONSULTAS
- * ============================
- */
+    get,
+
+    post,
+
+    put,
+
+    del
+
+} from "./api";
 
 export async function obtenerPedidos() {
 
@@ -12,32 +16,26 @@ export async function obtenerPedidos() {
 
 }
 
-/*
- * ============================
- * PEDIDOS
- * ============================
- */
+export async function obtenerPedido(id) {
 
-export async function crearPedido(pedido) {
-
-    return await post("/pedidos", pedido);
+    return await get(`/pedidos/${id}`);
 
 }
 
-/*
- * ============================
- * RUTA
- * ============================
- */
+export async function crearPedido(datos) {
 
-export async function iniciarRuta() {
-
-    return await post("/pedidos/iniciar-ruta", {});
+    return await post("/pedidos", datos);
 
 }
 
-export async function entregarPedido(id) {
+export async function actualizarPedido(id, datos) {
 
-    return await put(`/pedidos/${id}/entregado`, {});
+    return await put(`/pedidos/${id}`, datos);
+
+}
+
+export async function eliminarPedido(id) {
+
+    return await del(`/pedidos/${id}`);
 
 }

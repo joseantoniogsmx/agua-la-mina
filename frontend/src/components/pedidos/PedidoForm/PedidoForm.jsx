@@ -28,7 +28,39 @@ export default function PedidoForm({
 
     function agregarProducto() {
 
-        if (!productoSeleccionado) return;
+        if (!productoSeleccionado) {
+
+            alert("Selecciona un producto.");
+
+            return;
+
+        }
+
+        if (cantidad <= 0) {
+
+            alert("La cantidad debe ser mayor que cero.");
+
+            return;
+
+        }
+
+        if (prestados < 0) {
+
+            alert("Los garrafones prestados no pueden ser negativos.");
+
+            return;
+
+        }
+
+        if (prestados > cantidad) {
+
+            alert(
+                "No puedes prestar más garrafones de los que se están comprando."
+            );
+
+            return;
+
+        }
 
         const subtotal =
             Number(productoSeleccionado.precio) * cantidad;

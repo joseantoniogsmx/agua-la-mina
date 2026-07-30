@@ -1,8 +1,122 @@
+import { useState } from "react";
+
+import PedidoCard from "./PedidoCard";
+
+import ConfirmDialog from "../../common/ConfirmDialog/ConfirmDialog";
+
+import { eliminarPedido } from "../../../services/pedidoService";
+
 import "./PedidoTable.css";
 
-export default function PedidoTable({ pedidos }) {
+export default function PedidoTable({
 
-    if (pedidos.length === 0) {
+    pedidos,
+
+    onActualizar
+
+}) {
+
+    const [pedidoExpandido, setPedidoExpandido] = useState(null);
+
+    const [pedidoAEliminar, setPedidoAEliminar] = useState(null);
+
+    const [eliminando, setEliminando] = useState(false);
+
+    function alternarPedido(id) {
+
+        setPedidoExpandido(
+
+            pedidoExpandido === id
+
+                ? null
+
+                : id
+
+        );
+
+    }
+
+    function editarPedido(pedido) {
+
+        console.log(
+
+            "Editar pedido:",
+
+            pedido
+
+        );
+
+    }
+
+    function solicitarEliminacion(pedido) {
+
+        setPedidoAEliminar(pedido);
+
+    }
+
+    function cancelarEliminacion() {
+
+        if (eliminando)
+
+            return;
+
+        setPedidoAEliminar(null);
+
+    }
+
+    async function confirmarEliminacion() {
+
+        if (!pedidoAEliminar)
+
+            return;
+
+        try {
+
+            setEliminando(true);
+
+            await eliminarPedido(
+
+                pedidoAEliminar.id
+
+            );
+
+            setPedidoAEliminar(null);
+
+            if (onActualizar) {
+
+                await onActualizar();
+
+            }
+
+        }
+
+        catch (error) {
+
+            console.error(
+
+                "Error al eliminar el pedido:",
+
+                error
+
+            );
+
+            alert(
+
+                "No fue posible eliminar el pedido."
+
+            );
+
+        }
+
+        finally {
+
+            setEliminando(false);
+
+        }
+
+    }
+
+    if (!pedidos.length) {
 
         return (
 
@@ -18,101 +132,139 @@ export default function PedidoTable({ pedidos }) {
 
     return (
 
-        <table className="pedido-table">
+        <>
 
-            <thead>
+            <div className="pedido-listado">
 
-                <tr>
+                {
 
-                    <th>Folio</th>
+                    pedidos.map((pedido) => (
 
-                    <th>Cliente</th>
+                        <PedidoCard
 
-                    <th>Productos</th>
+                            key={pedido.id}
 
-                    <th>Total</th>
+                            pedido={pedido}
 
-                    <th>Estado</th>
+                            expandido={
 
-                    <th>Fecha</th>
-
-                    <th>Acciones</th>
-
-                </tr>
-
-            </thead>
-
-            <tbody>
-
-                {pedidos.map((pedido) => (
-
-                    <tr key={pedido.id}>
-
-                        <td>{pedido.id}</td>
-
-                        <td>
-
-                            {pedido.cliente
-                                ? pedido.cliente.nombre
-                                : "-"}
-
-                        </td>
-
-                        <td>
-
-                            {pedido.detalles
-                                ? pedido.detalles.length
-                                : 0}
-
-                        </td>
-
-                        <td>
-
-                            ${Number(pedido.total).toFixed(2)}
-
-                        </td>
-
-                        <td>
-
-                            <span
-                                className={`estado estado-${pedido.estado?.toLowerCase()}`}
-                            >
-
-                                {pedido.estado}
-
-                            </span>
-
-                        </td>
-
-                        <td>
-
-                            {
-
-                                pedido.fecha
-                                    ? new Date(pedido.fecha).toLocaleString()
-                                    : ""
+                                pedidoExpandido === pedido.id
 
                             }
 
-                        </td>
+                            onExpandir={alternarPedido}
 
-                        <td>
+                            onEditar={editarPedido}
 
-                            <button className="btn-ver">
+                            onEliminar={solicitarEliminacion}
 
-                                👁
+                        />
 
-                            </button>
+                    ))
 
-                        </td>
+                }
 
-                    </tr>
+            </div>
 
-                ))}
+            <ConfirmDialog
 
-            </tbody>
+                abierto={
 
-        </table>
+                    pedidoAEliminar !== null
+
+                }
+
+                titulo="Eliminar pedido"
+
+                mensaje="¿Deseas eliminar este pedido? Esta acción no puede deshacerse."
+
+                textoAceptar="Eliminar"
+
+                textoCancelar="Cancelar"
+
+                variante="danger"
+
+                cargando={eliminando}
+
+                onCancelar={cancelarEliminacion}
+
+                onAceptar={confirmarEliminacion}
+
+            >
+
+                {
+
+                    pedidoAEliminar && (
+
+                        <>
+
+                            <strong>
+
+                                Cliente
+
+                            </strong>
+
+                            <p>
+
+                                {
+
+                                    pedidoAEliminar.cliente
+
+                                        ?.nombre ??
+
+                                    "Sin cliente"
+
+                                }
+
+                            </p>
+
+                            <strong>
+
+                                Total
+
+                            </strong>
+
+                            <p>
+
+                                $
+
+                                {
+
+                                    Number(
+
+                                        pedidoAEliminar.total
+
+                                    ).toFixed(2)
+
+                                }
+
+                            </p>
+
+                            <strong>
+
+                                Estado
+
+                            </strong>
+
+                            <p>
+
+                                {
+
+                                    pedidoAEliminar.estado
+
+                                }
+
+                            </p>
+
+                        </>
+
+                    )
+
+                }
+
+            </ConfirmDialog>
+
+        </>
 
     );
 

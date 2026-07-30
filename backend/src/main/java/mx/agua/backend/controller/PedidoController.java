@@ -89,6 +89,24 @@ public class PedidoController {
 
     }
 
+    @DeleteMapping("/{id}")
+    public ResponseEntity<Void> eliminarPedido(
+            @PathVariable Integer id) {
+
+        Pedido pedido = pedidoRepository.findById(id).orElse(null);
+
+        if (pedido == null) {
+
+            return ResponseEntity.notFound().build();
+
+        }
+
+        pedidoRepository.delete(pedido);
+
+        return ResponseEntity.noContent().build();
+
+    }
+
     private PedidoResponse convertirPedido(Pedido pedido) {
 
         PedidoResponse response = new PedidoResponse();

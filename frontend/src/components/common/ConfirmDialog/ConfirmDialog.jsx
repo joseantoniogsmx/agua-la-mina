@@ -1,46 +1,122 @@
+import Modal from "../Modal/Modal";
+
 import "./ConfirmDialog.css";
 
 export default function ConfirmDialog({
-    abierto,
-    titulo,
-    mensaje,
-    onCancelar,
-    onConfirmar
-}) {
 
-    if (!abierto) return null;
+    abierto,
+
+    titulo = "Confirmar",
+
+    mensaje,
+
+    children,
+
+    textoCancelar = "Cancelar",
+
+    textoAceptar = "Aceptar",
+
+    variante = "danger",
+
+    cargando = false,
+
+    onCancelar,
+
+    onAceptar
+
+}) {
 
     return (
 
-        <div className="confirm-overlay">
+        <Modal
+
+            abierto={abierto}
+
+            titulo={titulo}
+
+            onCerrar={onCancelar}
+
+            ancho="480px"
+
+        >
 
             <div className="confirm-dialog">
 
-                <h2>{titulo}</h2>
+                {
 
-                <p>{mensaje}</p>
+                    mensaje && (
 
-                <div className="confirm-buttons">
+                        <p className="confirm-dialog-mensaje">
+
+                            {mensaje}
+
+                        </p>
+
+                    )
+
+                }
+
+                {
+
+                    children && (
+
+                        <div className="confirm-dialog-contenido">
+
+                            {children}
+
+                        </div>
+
+                    )
+
+                }
+
+                <div className="confirm-dialog-botones">
 
                     <button
-                        className="btn-secondary"
+
+                        type="button"
+
+                        className="btn-secundario"
+
                         onClick={onCancelar}
+
+                        disabled={cargando}
+
                     >
-                        Cancelar
+
+                        {textoCancelar}
+
                     </button>
 
                     <button
-                        className="btn-danger"
-                        onClick={onConfirmar}
+
+                        type="button"
+
+                        className={`btn-${variante}`}
+
+                        onClick={onAceptar}
+
+                        disabled={cargando}
+
                     >
-                        Eliminar
+
+                        {
+
+                            cargando
+
+                                ? "Procesando..."
+
+                                : textoAceptar
+
+                        }
+
                     </button>
 
                 </div>
 
             </div>
 
-        </div>
+        </Modal>
 
     );
 

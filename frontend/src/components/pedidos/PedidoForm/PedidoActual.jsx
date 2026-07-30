@@ -1,3 +1,5 @@
+import "./PedidoActual.css";
+
 export default function PedidoActual({
 
     pedidoActual,
@@ -16,7 +18,33 @@ export default function PedidoActual({
 
         <section className="pedido-actual">
 
-            <h2>Pedido actual</h2>
+            <div className="pedido-header">
+
+                <h2>🛒 Pedido actual</h2>
+
+                {
+
+                    pedidoActual.length > 0 &&
+
+                    <span className="pedido-badge">
+
+                        {pedidoActual.length}
+
+                        {
+
+                            pedidoActual.length === 1
+
+                                ? " producto"
+
+                                : " productos"
+
+                        }
+
+                    </span>
+
+                }
+
+            </div>
 
             {
 
@@ -24,139 +52,199 @@ export default function PedidoActual({
 
                     ?
 
-                    <p>No hay productos agregados.</p>
+                    <div className="pedido-vacio">
+
+                        <div className="pedido-vacio-icono">
+
+                            📦
+
+                        </div>
+
+                        <h3>
+
+                            Aún no hay productos
+
+                        </h3>
+
+                        <p>
+
+                            Selecciona un producto para comenzar el pedido.
+
+                        </p>
+
+                    </div>
 
                     :
 
-                    pedidoActual.map((item, index) => (
+                    <>
 
-                        <div
+                        <div className="pedido-lista">
 
-                            key={index}
+                            {
 
-                            className="linea-pedido"
+                                pedidoActual.map((item, index) => (
 
-                        >
+                                    <div
 
-                            <div>
+                                        key={index}
 
-                                <strong>
+                                        className="pedido-card"
 
-                                    {item.producto.marca}
+                                    >
 
-                                </strong>
+                                        <div className="pedido-info">
 
-                                {
+                                            <div>
 
-                                    item.producto.capacidadLitros && (
+                                                <h4>
 
-                                        <div>
+                                                    {item.producto.marca}
 
-                                            {item.producto.capacidadLitros} L
+                                                </h4>
+
+                                                <span>
+
+                                                    {item.producto.capacidadLitros} L
+
+                                                </span>
+
+                                            </div>
+
+                                            <button
+
+                                                type="button"
+
+                                                className="btn-eliminar"
+
+                                                onClick={() =>
+                                                    onEliminarLinea(index)
+                                                }
+
+                                                title="Eliminar producto"
+
+                                            >
+
+                                                🗑️
+
+                                            </button>
 
                                         </div>
 
-                                    )
+                                        <div className="pedido-detalles">
 
-                                }
+                                            <div>
 
-                            </div>
+                                                <span className="etiqueta">
 
-                            <div>
+                                                    Cantidad
 
-                                Cantidad: {item.cantidad}
+                                                </span>
 
-                            </div>
+                                                <strong>
 
-                            <div>
+                                                    {item.cantidad}
 
-                                Prestados: {item.prestados}
+                                                </strong>
 
-                            </div>
+                                            </div>
 
-                            <div>
+                                            <div>
 
-                                ${Number(item.subtotal).toFixed(2)}
+                                                <span className="etiqueta">
 
-                            </div>
+                                                    Prestados
+
+                                                </span>
+
+                                                <strong>
+
+                                                    {item.prestados}
+
+                                                </strong>
+
+                                            </div>
+
+                                            <div>
+
+                                                <span className="etiqueta">
+
+                                                    Subtotal
+
+                                                </span>
+
+                                                <strong className="subtotal">
+
+                                                    $
+
+                                                    {Number(item.subtotal).toFixed(2)}
+
+                                                </strong>
+
+                                            </div>
+
+                                        </div>
+
+                                    </div>
+
+                                ))
+
+                            }
+
+                        </div>
+
+                        <div className="pedido-total">
+
+                            <span>
+
+                                Total del pedido
+
+                            </span>
+
+                            <strong>
+
+                                $
+
+                                {Number(totalPedido).toFixed(2)}
+
+                            </strong>
+
+                        </div>
+
+                        <div className="pedido-botones">
 
                             <button
 
                                 type="button"
 
-                                className="btn-danger"
+                                className="btn-secondary"
 
-                                onClick={() =>
-                                    onEliminarLinea(index)
-                                }
+                                onClick={onVaciarPedido}
 
                             >
 
-                                ❌
+                                Vaciar pedido
+
+                            </button>
+
+                            <button
+
+                                type="button"
+
+                                className="btn-primary"
+
+                                onClick={onGuardarPedido}
+
+                            >
+
+                                Guardar pedido
 
                             </button>
 
                         </div>
 
-                    ))
+                    </>
 
             }
-
-            <hr />
-
-            <h3>
-
-                Total: ${Number(totalPedido).toFixed(2)}
-
-            </h3>
-
-            <div
-
-                style={{
-
-                    display: "flex",
-
-                    gap: "12px",
-
-                    marginTop: "15px"
-
-                }}
-
-            >
-
-                <button
-
-                    type="button"
-
-                    className="btn-primary"
-
-                    disabled={pedidoActual.length === 0}
-
-                    onClick={onGuardarPedido}
-
-                >
-
-                    Guardar pedido
-
-                </button>
-
-                <button
-
-                    type="button"
-
-                    className="btn-secondary"
-
-                    disabled={pedidoActual.length === 0}
-
-                    onClick={onVaciarPedido}
-
-                >
-
-                    Vaciar pedido
-
-                </button>
-
-            </div>
 
         </section>
 
