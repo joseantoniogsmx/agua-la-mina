@@ -23,11 +23,13 @@ export default function Pedidos() {
 
     const [cargando, setCargando] = useState(true);
 
+
     useEffect(() => {
 
         cargarInformacion();
 
     }, []);
+
 
     async function cargarInformacion() {
 
@@ -63,7 +65,11 @@ export default function Pedidos() {
 
             console.error(error);
 
-            alert("No fue posible cargar la información.");
+            alert(
+
+                "No fue posible cargar la información."
+
+            );
 
         } finally {
 
@@ -73,13 +79,18 @@ export default function Pedidos() {
 
     }
 
+
     async function guardarPedido(request) {
 
         try {
 
             await crearPedido(request);
 
-            alert("Pedido registrado correctamente.");
+            alert(
+
+                "Pedido registrado correctamente."
+
+            );
 
             await cargarInformacion();
 
@@ -105,6 +116,7 @@ export default function Pedidos() {
 
     }
 
+
     return (
 
         <div className="pedidos-page">
@@ -115,11 +127,16 @@ export default function Pedidos() {
 
                     <h1>Pedidos</h1>
 
-                    <p>Administración de pedidos</p>
+                    <p>
+
+                        Administración de pedidos
+
+                    </p>
 
                 </div>
 
             </div>
+
 
             <PedidoForm
 
@@ -131,9 +148,14 @@ export default function Pedidos() {
 
             />
 
+
             <section className="pedidos-lista">
 
-                <h2>Pedidos registrados</h2>
+                <h2>
+
+                    Pedidos registrados
+
+                </h2>
 
                 {
 
@@ -141,13 +163,19 @@ export default function Pedidos() {
 
                         ?
 
-                        <p>Cargando pedidos...</p>
+                        <p>
+
+                            Cargando pedidos...
+
+                        </p>
 
                         :
 
                         <PedidoTable
 
                             pedidos={pedidos}
+
+                            onActualizar={cargarInformacion}
 
                         />
 

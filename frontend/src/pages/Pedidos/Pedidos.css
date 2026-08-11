@@ -1,55 +1,507 @@
-.pedidos-page{
+.pedidos-page {
 
-    padding:10px;
+    padding: 10px;
 
-}
+    font-family:
 
-.pedidos-header{
+        Inter,
 
-    display:flex;
+        "Segoe UI",
 
-    justify-content:space-between;
+        Roboto,
 
-    align-items:center;
+        Helvetica,
 
-    margin-bottom:30px;
+        Arial,
 
-}
+        sans-serif;
 
-.pedidos-header h1{
-
-    color:#003B73;
-
-    margin-bottom:6px;
+    color: #1f2937;
 
 }
 
-.pedidos-header p{
 
-    color:#6B7280;
+/* ==========================================================
+   ENCABEZADO
+   ========================================================== */
 
-}
+.pedidos-header {
 
-.btn-primary{
+    display: flex;
 
-    background:#005A9C;
+    justify-content: space-between;
 
-    color:white;
+    align-items: center;
 
-    border:none;
-
-    padding:14px 24px;
-
-    border-radius:12px;
-
-    cursor:pointer;
-
-    font-weight:600;
+    margin-bottom: 30px;
 
 }
 
-.btn-primary:hover{
 
-    background:#0078D4;
+.pedidos-header h1 {
+
+    color: #003B73;
+
+    margin-bottom: 6px;
+
+    font-size: 2rem;
+
+    font-weight: 700;
+
+}
+
+
+.pedidos-header p {
+
+    margin: 0;
+
+    color: #6B7280;
+
+    font-size: .95rem;
+
+}
+
+
+/* ==========================================================
+   FORMULARIO DE NUEVO PEDIDO
+   ========================================================== */
+
+.nuevo-pedido {
+
+    padding: 28px;
+
+    background: #ffffff;
+
+    border: 1px solid #e5e7eb;
+
+    border-radius: 16px;
+
+    box-shadow: 0 3px 12px rgba(0, 0, 0, .06);
+
+}
+
+
+.nuevo-pedido h2 {
+
+    margin: 0 0 24px;
+
+    color: #003B73;
+
+    font-size: 1.35rem;
+
+    font-weight: 700;
+
+}
+
+
+.nuevo-pedido h3 {
+
+    color: #174a73;
+
+    font-size: 1rem;
+
+    font-weight: 700;
+
+}
+
+
+/* ==========================================================
+   CLIENTE Y PRIORIDAD
+   ========================================================== */
+
+.cliente-prioridad {
+
+    display: grid;
+
+    grid-template-columns:
+
+        minmax(0, 2fr)
+
+        minmax(180px, 1fr);
+
+    gap: 20px;
+
+    margin-bottom: 20px;
+
+}
+
+
+.campo-pedido {
+
+    display: flex;
+
+    flex-direction: column;
+
+    gap: 7px;
+
+}
+
+
+.campo-pedido label {
+
+    color: #374151;
+
+    font-family:
+
+        Inter,
+
+        "Segoe UI",
+
+        Roboto,
+
+        Helvetica,
+
+        Arial,
+
+        sans-serif;
+
+    font-size: .86rem;
+
+    font-weight: 600;
+
+}
+
+
+.campo-pedido select {
+
+    width: 100%;
+
+    min-height: 44px;
+
+    box-sizing: border-box;
+
+    padding: 10px 13px;
+
+    border: 1px solid #cbd5e1;
+
+    border-radius: 10px;
+
+    background: #ffffff;
+
+    color: #1f2937;
+
+    font-family:
+
+        Inter,
+
+        "Segoe UI",
+
+        Roboto,
+
+        Helvetica,
+
+        Arial,
+
+        sans-serif;
+
+    font-size: .92rem;
+
+    outline: none;
+
+    cursor: pointer;
+
+    transition:
+
+        border-color .2s ease,
+
+        box-shadow .2s ease;
+
+}
+
+
+.campo-pedido select:focus {
+
+    border-color: #0078B8;
+
+    box-shadow:
+
+        0 0 0 3px rgba(
+
+            0,
+
+            120,
+
+            184,
+
+            .12
+
+        );
+
+}
+
+
+/* ==========================================================
+   OBSERVACIONES
+   ========================================================== */
+
+.nuevo-pedido > div {
+
+    font-family:
+
+        Inter,
+
+        "Segoe UI",
+
+        Roboto,
+
+        Helvetica,
+
+        Arial,
+
+        sans-serif;
+
+}
+
+
+.nuevo-pedido > div > label {
+
+    display: block;
+
+    margin-bottom: 7px;
+
+    color: #374151;
+
+    font-size: .86rem;
+
+    font-weight: 600;
+
+}
+
+
+.nuevo-pedido textarea {
+
+    width: 100%;
+
+    box-sizing: border-box;
+
+    min-height: 90px;
+
+    padding: 11px 13px;
+
+    border: 1px solid #cbd5e1;
+
+    border-radius: 10px;
+
+    background: #ffffff;
+
+    color: #1f2937;
+
+    font-family:
+
+        Inter,
+
+        "Segoe UI",
+
+        Roboto,
+
+        Helvetica,
+
+        Arial,
+
+        sans-serif;
+
+    font-size: .92rem;
+
+    line-height: 1.5;
+
+    resize: vertical;
+
+    outline: none;
+
+    transition:
+
+        border-color .2s ease,
+
+        box-shadow .2s ease;
+
+}
+
+
+.nuevo-pedido textarea::placeholder {
+
+    color: #9ca3af;
+
+}
+
+
+.nuevo-pedido textarea:focus {
+
+    border-color: #0078B8;
+
+    box-shadow:
+
+        0 0 0 3px rgba(
+
+            0,
+
+            120,
+
+            184,
+
+            .12
+
+        );
+
+}
+
+
+/* ==========================================================
+   SEPARADOR DE PRODUCTOS
+   ========================================================== */
+
+.separador-productos {
+
+    margin: 26px 0 20px;
+
+    border: 0;
+
+    border-top: 1px solid #e5e7eb;
+
+}
+
+
+.titulo-productos {
+
+    margin: 0 0 16px;
+
+    color: #174a73;
+
+    font-size: 1rem;
+
+    font-weight: 700;
+
+}
+
+
+/* ==========================================================
+   BOTÓN PRINCIPAL
+   ========================================================== */
+
+.btn-primary {
+
+    background: #005A9C;
+
+    color: #ffffff;
+
+    border: none;
+
+    padding: 14px 24px;
+
+    border-radius: 12px;
+
+    cursor: pointer;
+
+    font-family:
+
+        Inter,
+
+        "Segoe UI",
+
+        Roboto,
+
+        Helvetica,
+
+        Arial,
+
+        sans-serif;
+
+    font-size: .92rem;
+
+    font-weight: 600;
+
+    transition:
+
+        background .2s ease,
+
+        transform .15s ease,
+
+        opacity .2s ease;
+
+}
+
+
+.btn-primary:hover:not(:disabled) {
+
+    background: #0078D4;
+
+    transform: translateY(-1px);
+
+}
+
+
+.btn-primary:disabled {
+
+    opacity: .5;
+
+    cursor: not-allowed;
+
+}
+
+
+/* ==========================================================
+   LISTA DE PEDIDOS
+   ========================================================== */
+
+.pedidos-lista {
+
+    margin-top: 32px;
+
+}
+
+
+.pedidos-lista h2 {
+
+    margin: 0 0 8px;
+
+    color: #003B73;
+
+    font-size: 1.35rem;
+
+    font-weight: 700;
+
+}
+
+
+/* ==========================================================
+   RESPONSIVE
+   ========================================================== */
+
+@media (max-width: 700px) {
+
+    .pedidos-page {
+
+        padding: 8px;
+
+    }
+
+
+    .nuevo-pedido {
+
+        padding: 20px;
+
+    }
+
+
+    .cliente-prioridad {
+
+        grid-template-columns: 1fr;
+
+        gap: 14px;
+
+    }
+
+
+    .pedidos-header {
+
+        margin-bottom: 20px;
+
+    }
+
+
+    .pedidos-header h1 {
+
+        font-size: 1.7rem;
+
+    }
 
 }

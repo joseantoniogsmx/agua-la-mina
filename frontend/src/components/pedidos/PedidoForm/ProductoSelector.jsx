@@ -22,9 +22,67 @@ export default function ProductoSelector({
 
     const datosValidos =
         productoSeleccionado &&
-        cantidad > 0 &&
-        prestados >= 0 &&
-        prestados <= cantidad;
+        Number(cantidad) >= 1 &&
+        Number(prestados) >= 0 &&
+        Number(prestados) <= Number(cantidad);
+
+
+    function seleccionarProducto(producto) {
+
+        setProductoSeleccionado(producto);
+
+        setCantidad(1);
+
+        setPrestados(0);
+
+    }
+
+
+    function cambiarCantidad(valor) {
+
+        const nuevaCantidad = Math.max(
+
+            1,
+
+            Number(valor) || 1
+
+        );
+
+        setCantidad(nuevaCantidad);
+
+        if (Number(prestados) > nuevaCantidad) {
+
+            setPrestados(nuevaCantidad);
+
+        }
+
+    }
+
+
+    function cambiarPrestados(valor) {
+
+        const nuevosPrestados = Math.max(
+
+            0,
+
+            Number(valor) || 0
+
+        );
+
+        setPrestados(
+
+            Math.min(
+
+                nuevosPrestados,
+
+                Number(cantidad)
+
+            )
+
+        );
+
+    }
+
 
     return (
 
@@ -33,17 +91,24 @@ export default function ProductoSelector({
             <hr className="separador-productos" />
 
             <h3 className="titulo-productos">
+
                 Selecciona un producto
+
             </h3>
+
 
             <div className="selector-productos">
 
                 {
 
-                    productos.map(producto => {
+                    productos.map((producto) => {
 
                         const seleccionado =
-                            productoSeleccionado?.id === producto.id;
+
+                            productoSeleccionado?.id ===
+
+                            producto.id;
+
 
                         return (
 
@@ -52,28 +117,41 @@ export default function ProductoSelector({
                                 key={producto.id}
 
                                 className={
+
                                     seleccionado
+
                                         ? "producto-card seleccionado"
+
                                         : "producto-card"
+
                                 }
 
                                 onClick={() =>
-                                    setProductoSeleccionado(producto)
+
+                                    seleccionarProducto(
+
+                                        producto
+
+                                    )
+
                                 }
 
                             >
 
                                 {
 
-                                    seleccionado &&
+                                    seleccionado && (
 
-                                    <div className="check">
+                                        <div className="check">
 
-                                        ✓
+                                            ✓
 
-                                    </div>
+                                        </div>
+
+                                    )
 
                                 }
+
 
                                 <img
 
@@ -85,11 +163,13 @@ export default function ProductoSelector({
 
                                 />
 
+
                                 <h4>
 
                                     {producto.marca}
 
                                 </h4>
+
 
                                 <p>
 
@@ -97,121 +177,150 @@ export default function ProductoSelector({
 
                                 </p>
 
+
                                 <div className="precio">
 
-                                    ${Number(producto.precio).toFixed(2)}
+                                    $
+
+                                    {
+
+                                        Number(
+
+                                            producto.precio
+
+                                        ).toFixed(2)
+
+                                    }
 
                                 </div>
 
+
                                 {
 
-                                    seleccionado &&
+                                    seleccionado && (
 
-                                    <>
+                                        <div
 
-                                        <div className="inputs-card">
+                                            className="producto-configuracion"
 
-                                            <div>
+                                            onClick={(e) =>
 
-                                                <label>
+                                                e.stopPropagation()
 
-                                                    Cantidad
-
-                                                </label>
-
-                                                <input
-
-                                                    type="number"
-
-                                                    min="1"
-
-                                                    value={cantidad}
-
-                                                    onClick={(e)=>e.stopPropagation()}
-
-                                                    onChange={(e)=>
-
-                                                        setCantidad(
-
-                                                            Number(e.target.value)
-
-                                                        )
-
-                                                    }
-
-                                                />
-
-                                            </div>
-
-                                            <div>
-
-                                                <label>
-
-                                                    Garrafones prestados
-
-                                                </label>
-
-                                                <input
-
-                                                    type="number"
-
-                                                    min="0"
-
-                                                    value={prestados}
-
-                                                    onClick={(e)=>e.stopPropagation()}
-
-                                                    onChange={(e)=>
-
-                                                        setPrestados(
-
-                                                            Number(e.target.value)
-
-                                                        )
-
-                                                    }
-
-                                                />
-
-                                                {
-
-                                                    prestados > cantidad &&
-
-                                                    <small className="input-error">
-
-                                                        Los prestados no pueden ser mayores que la cantidad comprada.
-
-                                                    </small>
-
-                                                }
-
-                                            </div>
-
-                                        </div>
-
-                                        <button
-
-                                            type="button"
-
-                                            className="btn-agregar"
-
-                                            disabled={!datosValidos}
-
-                                            onClick={(e)=>{
-
-                                                e.stopPropagation();
-
-                                                onAgregarProducto();
-
-                                            }}
+                                            }
 
                                         >
 
-                                            + Agregar al pedido
+                                            <div className="inputs-card">
 
-                                        </button>
+                                                <div>
 
-                                    </>
+                                                    <label>
+
+                                                        Cantidad
+
+                                                    </label>
+
+                                                    <input
+
+                                                        type="number"
+
+                                                        min="1"
+
+                                                        value={cantidad}
+
+                                                        onChange={(e) =>
+
+                                                            cambiarCantidad(
+
+                                                                e.target.value
+
+                                                            )
+
+                                                        }
+
+                                                    />
+
+                                                </div>
+
+
+                                                <div>
+
+                                                    <label>
+
+                                                        Garrafones prestados
+
+                                                    </label>
+
+                                                    <input
+
+                                                        type="number"
+
+                                                        min="0"
+
+                                                        max={cantidad}
+
+                                                        value={prestados}
+
+                                                        onChange={(e) =>
+
+                                                            cambiarPrestados(
+
+                                                                e.target.value
+
+                                                            )
+
+                                                        }
+
+                                                    />
+
+
+                                                    {
+
+                                                        prestados >
+
+                                                            cantidad && (
+
+                                                            <small className="input-error">
+
+                                                                Los prestados no pueden ser mayores que la cantidad comprada.
+
+                                                            </small>
+
+                                                        )
+
+                                                    }
+
+                                                </div>
+
+                                            </div>
+
+
+                                            <button
+
+                                                type="button"
+
+                                                className="btn-agregar"
+
+                                                disabled={!datosValidos}
+
+                                                onClick={(e) => {
+
+                                                    e.stopPropagation();
+
+                                                    onAgregarProducto();
+
+                                                }}
+
+                                            >
+
+                                                + Agregar al pedido
+
+                                            </button>
+
+                                        </div>
+
+                                    )
 
                                 }
 

@@ -9,7 +9,6 @@ import mx.agua.backend.model.Pedido;
 import mx.agua.backend.model.PedidoEstado;
 import mx.agua.backend.repository.PedidoRepository;
 import mx.agua.backend.service.PedidoV2Service;
-import mx.agua.backend.service.routing.RutaService;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
@@ -21,162 +20,227 @@ import java.util.List;
 public class PedidoController {
 
     private final PedidoRepository pedidoRepository;
-    private final RutaService rutaService;
+
     private final PedidoV2Service pedidoV2Service;
+
 
     public PedidoController(
             PedidoRepository pedidoRepository,
-            RutaService rutaService,
             PedidoV2Service pedidoV2Service) {
 
         this.pedidoRepository = pedidoRepository;
-        this.rutaService = rutaService;
+
         this.pedidoV2Service = pedidoV2Service;
+
     }
+
 
     @GetMapping
     public List<PedidoResponse> listarPedidos() {
 
         return pedidoRepository.findAll()
+
                 .stream()
+
                 .map(this::convertirPedido)
+
                 .toList();
 
     }
+
 
     @GetMapping("/pendientes")
     public List<PedidoResponse> listarPendientes() {
 
-        return pedidoRepository.findByEstado(PedidoEstado.PENDIENTE)
+        return pedidoRepository
+                .findByEstado(PedidoEstado.PENDIENTE)
+
                 .stream()
+
                 .map(this::convertirPedido)
+
                 .toList();
 
     }
+
 
     @PostMapping
     public ResponseEntity<Pedido> crearPedido(
             @RequestBody CrearPedidoRequest request) {
 
-        Pedido pedido = pedidoV2Service.crearPedido(request);
+        Pedido pedido =
+                pedidoV2Service.crearPedido(request);
 
         return ResponseEntity.ok(pedido);
 
     }
 
-    @PostMapping("/iniciar-ruta")
-    public List<Pedido> iniciarRuta() {
-
-        return rutaService.generarRuta();
-
-    }
 
     @PutMapping("/{id}/entregado")
     public ResponseEntity<Pedido> entregarPedido(
             @PathVariable Integer id) {
 
         return pedidoRepository.findById(id)
+
                 .map(pedido -> {
 
-                    pedido.setEstado(PedidoEstado.ENTREGADO);
+                    pedido.setEstado(
+                            PedidoEstado.ENTREGADO
+                    );
 
                     pedidoRepository.save(pedido);
 
                     return ResponseEntity.ok(pedido);
 
                 })
-                .orElse(ResponseEntity.notFound().build());
+
+                .orElse(
+                        ResponseEntity.notFound().build()
+                );
 
     }
 
-    @DeleteMapping("/{id}")
-    public ResponseEntity<Void> eliminarPedido(
-            @PathVariable Integer id) {
 
-        Pedido pedido = pedidoRepository.findById(id).orElse(null);
+    private PedidoResponse convertirPedido(
+            Pedido pedido) {
 
-        if (pedido == null) {
+        PedidoResponse response =
+                new PedidoResponse();
 
-            return ResponseEntity.notFound().build();
 
-        }
-
-        pedidoRepository.delete(pedido);
-
-        return ResponseEntity.noContent().build();
-
-    }
-
-    private PedidoResponse convertirPedido(Pedido pedido) {
-
-        PedidoResponse response = new PedidoResponse();
-
-        response.setId(pedido.getId());
-
-        response.setTotal(pedido.getTotal());
-
-        response.setPrioridad(pedido.getPrioridad());
-
-        response.setEstado(
-                pedido.getEstado() != null
-                        ? pedido.getEstado().name()
-                        : null
+        response.setId(
+                pedido.getId()
         );
 
-        response.setFecha(pedido.getFecha());
 
-        response.setOrigen(pedido.getOrigen());
+        response.setTotal(
+                pedido.getTotal()
+        );
 
-        response.setNotas(pedido.getNotas());
+
+        response.setPrioridad(
+                pedido.getPrioridad()
+        );
+
+
+        response.setEstado(
+
+                pedido.getEstado() != null
+
+                        ? pedido.getEstado().name()
+
+                        : null
+
+        );
+
+
+        response.setFecha(
+                pedido.getFecha()
+        );
+
+
+        response.setOrigen(
+                pedido.getOrigen()
+        );
+
+
+        response.setNotas(
+                pedido.getNotas()
+        );
+
 
         if (pedido.getCliente() != null) {
 
             response.setCliente(
+
                     new ClienteResponse(
+
                             pedido.getCliente().getId(),
-                            pedido.getCliente().getNombre()
+
+                            pedido.getCliente().getNombre(),
+
+                            pedido.getCliente().getDireccion(),
+
+                            pedido.getCliente().getLatitud(),
+
+                            pedido.getCliente().getLongitud()
+
                     )
+
             );
 
         }
 
+
         response.setDetalles(
+
                 pedido.getDetalles()
+
                         .stream()
+
                         .map(this::convertirDetalle)
+
                         .toList()
+
         );
+
 
         return response;
 
     }
 
+
     private DetallePedidoResponse convertirDetalle(
             DetallePedido detalle) {
 
-        DetallePedidoResponse response = new DetallePedidoResponse();
+        DetallePedidoResponse response =
+                new DetallePedidoResponse();
 
-        response.setId(detalle.getId());
+
+        response.setId(
+                detalle.getId()
+        );
+
 
         if (detalle.getProducto() != null) {
 
-            response.setProductoId(detalle.getProducto().getId());
+            response.setProductoId(
+                    detalle.getProducto().getId()
+            );
 
-            response.setMarca(detalle.getProducto().getMarca());
+
+            response.setMarca(
+                    detalle.getProducto().getMarca()
+            );
+
 
             response.setCapacidadLitros(
-                    detalle.getProducto().getCapacidadLitros()
+                    detalle.getProducto()
+                            .getCapacidadLitros()
             );
 
         }
 
-        response.setCantidad(detalle.getCantidad());
 
-        response.setPrestados(detalle.getPrestados());
+        response.setCantidad(
+                detalle.getCantidad()
+        );
 
-        response.setPrecioUnitario(detalle.getPrecioUnitario());
 
-        response.setSubtotal(detalle.getSubtotal());
+        response.setPrestados(
+                detalle.getPrestados()
+        );
+
+
+        response.setPrecioUnitario(
+                detalle.getPrecioUnitario()
+        );
+
+
+        response.setSubtotal(
+                detalle.getSubtotal()
+        );
+
 
         return response;
 

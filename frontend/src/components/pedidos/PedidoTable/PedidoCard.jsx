@@ -1,11 +1,4 @@
-import PedidoDetalle from "./PedidoDetalle";
-
-import {
-    formatearFecha,
-    formatearMoneda,
-    obtenerClaseEstado,
-    obtenerResumenMarcas
-} from "./pedidoUtils";
+import "./PedidoCard.css";
 
 export default function PedidoCard({
 
@@ -15,21 +8,102 @@ export default function PedidoCard({
 
     onExpandir,
 
-    onEditar,
-
     onEliminar
 
 }) {
 
+    const detalles = pedido.detalles || [];
+
+
+    const resumenProductos = detalles.length === 0
+
+        ? "Sin productos"
+
+        : detalles
+
+            .slice(0, 2)
+
+            .map((detalle) => detalle.marca)
+
+            .join(" • ");
+
+
+    const productosRestantes =
+
+        detalles.length > 2
+
+            ? detalles.length - 2
+
+            : 0;
+
+
+    function obtenerClaseEstado(estado) {
+
+        if (!estado) {
+
+            return "estado-desconocido";
+
+        }
+
+        return `estado-${estado.toLowerCase()}`;
+
+    }
+
+
+    function formatearFecha(fecha) {
+
+        if (!fecha) {
+
+            return "-";
+
+        }
+
+        const fechaConvertida = new Date(fecha);
+
+        if (
+
+            Number.isNaN(
+
+                fechaConvertida.getTime()
+
+            )
+
+        ) {
+
+            return "-";
+
+        }
+
+        return fechaConvertida.toLocaleString();
+
+    }
+
+
     return (
 
-        <div className="pedido-item">
+        <article
 
-            <div className="pedido-resumen">
+            className={
 
-                <div className="pedido-folio">
+                expandido
 
-                    <small>Folio</small>
+                    ? "pedido-card expandido"
+
+                    : "pedido-card"
+
+            }
+
+        >
+
+            <div className="pedido-card-principal">
+
+                <div className="pedido-info folio">
+
+                    <span>
+
+                        Folio
+
+                    </span>
 
                     <strong>
 
@@ -39,19 +113,22 @@ export default function PedidoCard({
 
                 </div>
 
-                <div className="pedido-cliente">
 
-                    <small>Cliente</small>
+                <div className="pedido-info cliente">
+
+                    <span>
+
+                        Cliente
+
+                    </span>
 
                     <strong>
 
                         {
 
-                            pedido.cliente
+                            pedido.cliente?.nombre ??
 
-                                ? pedido.cliente.nombre
-
-                                : "-"
+                            "Sin cliente"
 
                         }
 
@@ -59,17 +136,46 @@ export default function PedidoCard({
 
                 </div>
 
-                <div className="pedido-productos">
 
-                    <small>Productos</small>
+                <div className="pedido-info productos">
+
+                    <span>
+
+                        Productos
+
+                    </span>
 
                     <strong>
 
                         {
 
-                            obtenerResumenMarcas(
+                            resumenProductos
 
-                                pedido
+                        }
+
+                        {
+
+                            productosRestantes > 0 && (
+
+                                <>
+
+                                    <br />
+
+                                    <small>
+
+                                        +
+
+                                        {
+
+                                            productosRestantes
+
+                                        }
+
+                                        {" más"}
+
+                                    </small>
+
+                                </>
 
                             )
 
@@ -79,19 +185,26 @@ export default function PedidoCard({
 
                 </div>
 
-                <div className="pedido-total">
 
-                    <small>Total</small>
+                <div className="pedido-info total">
+
+                    <span>
+
+                        Total
+
+                    </span>
 
                     <strong>
 
+                        $
+
                         {
 
-                            formatearMoneda(
+                            Number(
 
                                 pedido.total
 
-                            )
+                            ).toFixed(2)
 
                         }
 
@@ -99,31 +212,39 @@ export default function PedidoCard({
 
                 </div>
 
-                <div className="pedido-estado">
 
-                    <span
+                <div className="pedido-info estado-container">
 
-                        className={
+                    <span>
 
-                            obtenerClaseEstado(
+                        Estado
 
-                                pedido.estado
+                    </span>
 
-                            )
+                    <strong
 
-                        }
+                        className={`estado ${obtenerClaseEstado(
+
+                            pedido.estado
+
+                        )}`}
 
                     >
 
                         {pedido.estado}
 
-                    </span>
+                    </strong>
 
                 </div>
 
-                <div className="pedido-fecha">
 
-                    <small>Fecha</small>
+                <div className="pedido-info fecha">
+
+                    <span>
+
+                        Fecha
+
+                    </span>
 
                     <strong>
 
@@ -141,15 +262,14 @@ export default function PedidoCard({
 
                 </div>
 
+
                 <div className="pedido-acciones">
 
                     <button
 
                         type="button"
 
-                        className="btn-ver"
-
-                        title="Ver detalle"
+                        className="btn-expandir"
 
                         onClick={() =>
 
@@ -161,61 +281,36 @@ export default function PedidoCard({
 
                         }
 
-                    >
-
-                        {
+                        title={
 
                             expandido
 
-                                ? "▲"
+                                ? "Ocultar detalles"
 
-                                : "▼"
-
-                        }
-
-                    </button>
-
-                    <button
-
-                        type="button"
-
-                        className="btn-editar"
-
-                        title="Editar pedido"
-
-                        onClick={() =>
-
-                            onEditar(
-
-                                pedido
-
-                            )
+                                : "Ver detalles"
 
                         }
 
                     >
 
-                        ✏
+                        {expandido ? "▲" : "▼"}
 
                     </button>
+
 
                     <button
 
                         type="button"
 
-                        className="btn-eliminar"
-
-                        title="Eliminar pedido"
+                        className="btn-eliminar-pedido"
 
                         onClick={() =>
 
-                            onEliminar(
-
-                                pedido
-
-                            )
+                            onEliminar(pedido)
 
                         }
+
+                        title="Eliminar pedido"
 
                     >
 
@@ -227,21 +322,281 @@ export default function PedidoCard({
 
             </div>
 
+
             {
 
                 expandido && (
 
-                    <PedidoDetalle
+                    <div className="pedido-detalle">
 
-                        pedido={pedido}
+                        <div className="pedido-detalle-titulo">
 
-                    />
+                            Detalle del pedido
+
+                        </div>
+
+
+                        {
+
+                            detalles.length === 0
+
+                                ?
+
+                                (
+
+                                    <p className="sin-detalles">
+
+                                        Este pedido no tiene productos registrados.
+
+                                    </p>
+
+                                )
+
+                                :
+
+                                (
+
+                                    <div className="detalles-lista">
+
+                                        {
+
+                                            detalles.map(
+
+                                                (
+
+                                                    detalle,
+
+                                                    index
+
+                                                ) => (
+
+                                                    <div
+
+                                                        key={
+
+                                                            detalle.id ??
+
+                                                            index
+
+                                                        }
+
+                                                        className="detalle-producto"
+
+                                                    >
+
+                                                        <div className="detalle-producto-nombre">
+
+                                                            <strong>
+
+                                                                {
+
+                                                                    detalle.marca ??
+
+                                                                    "Producto"
+
+                                                                }
+
+                                                            </strong>
+
+                                                            {
+
+                                                                detalle.capacidadLitros && (
+
+                                                                    <span>
+
+                                                                        {
+
+                                                                            detalle.capacidadLitros
+
+                                                                        }
+
+                                                                        {" L"}
+
+                                                                    </span>
+
+                                                                )
+
+                                                            }
+
+                                                        </div>
+
+
+                                                        <div className="detalle-dato">
+
+                                                            <span>
+
+                                                                Cantidad
+
+                                                            </span>
+
+                                                            <strong>
+
+                                                                {
+
+                                                                    detalle.cantidad ??
+
+                                                                    0
+
+                                                                }
+
+                                                            </strong>
+
+                                                        </div>
+
+
+                                                        <div className="detalle-dato">
+
+                                                            <span>
+
+                                                                Prestados
+
+                                                            </span>
+
+                                                            <strong>
+
+                                                                {
+
+                                                                    detalle.prestados ??
+
+                                                                    0
+
+                                                                }
+
+                                                            </strong>
+
+                                                        </div>
+
+
+                                                        <div className="detalle-dato">
+
+                                                            <span>
+
+                                                                Precio
+
+                                                            </span>
+
+                                                            <strong>
+
+                                                                $
+
+                                                                {
+
+                                                                    Number(
+
+                                                                        detalle.precioUnitario ??
+
+                                                                        0
+
+                                                                    ).toFixed(2)
+
+                                                                }
+
+                                                            </strong>
+
+                                                        </div>
+
+
+                                                        <div className="detalle-dato subtotal">
+
+                                                            <span>
+
+                                                                Subtotal
+
+                                                            </span>
+
+                                                            <strong>
+
+                                                                $
+
+                                                                {
+
+                                                                    Number(
+
+                                                                        detalle.subtotal ??
+
+                                                                        0
+
+                                                                    ).toFixed(2)
+
+                                                                }
+
+                                                            </strong>
+
+                                                        </div>
+
+                                                    </div>
+
+                                                )
+
+                                            )
+
+                                        }
+
+                                    </div>
+
+                                )
+
+                        }
+
+
+                        <div className="detalle-total">
+
+                            <span>
+
+                                Total del pedido
+
+                            </span>
+
+                            <strong>
+
+                                $
+
+                                {
+
+                                    Number(
+
+                                        pedido.total
+
+                                    ).toFixed(2)
+
+                                }
+
+                            </strong>
+
+                        </div>
+
+
+                        {
+
+                            pedido.notas && (
+
+                                <div className="detalle-notas">
+
+                                    <strong>
+
+                                        Observaciones
+
+                                    </strong>
+
+                                    <p>
+
+                                        {pedido.notas}
+
+                                    </p>
+
+                                </div>
+
+                            )
+
+                        }
+
+                    </div>
 
                 )
 
             }
 
-        </div>
+        </article>
 
     );
 

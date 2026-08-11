@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 
 import PedidoCard from "./PedidoCard";
 
@@ -7,6 +7,8 @@ import ConfirmDialog from "../../common/ConfirmDialog/ConfirmDialog";
 import { eliminarPedido } from "../../../services/pedidoService";
 
 import "./PedidoTable.css";
+
+const PEDIDOS_POR_PAGINA = 10;
 
 export default function PedidoTable({
 
@@ -22,6 +24,161 @@ export default function PedidoTable({
 
     const [eliminando, setEliminando] = useState(false);
 
+    const [paginaActual, setPaginaActual] = useState(1);
+
+    const [fechaDesde, setFechaDesde] = useState("");
+
+    const [fechaHasta, setFechaHasta] = useState("");
+
+
+    function obtenerFechaLocal(fecha) {
+
+        if (!fecha) {
+
+            return "";
+
+        }
+
+        const fechaConvertida = new Date(fecha);
+
+        if (Number.isNaN(fechaConvertida.getTime())) {
+
+            return "";
+
+        }
+
+        const year = fechaConvertida.getFullYear();
+
+        const month = String(
+
+            fechaConvertida.getMonth() + 1
+
+        ).padStart(2, "0");
+
+        const day = String(
+
+            fechaConvertida.getDate()
+
+        ).padStart(2, "0");
+
+        return `${year}-${month}-${day}`;
+
+    }
+
+
+    const pedidosFiltrados = useMemo(() => {
+
+        return [...pedidos]
+
+            .filter((pedido) => {
+
+                const fechaPedido = obtenerFechaLocal(
+
+                    pedido.fecha
+
+                );
+
+                if (!fechaPedido) {
+
+                    return false;
+
+                }
+
+                if (
+
+                    fechaDesde &&
+
+                    fechaPedido < fechaDesde
+
+                ) {
+
+                    return false;
+
+                }
+
+                if (
+
+                    fechaHasta &&
+
+                    fechaPedido > fechaHasta
+
+                ) {
+
+                    return false;
+
+                }
+
+                return true;
+
+            })
+
+            .sort((a, b) => {
+
+                const fechaA = new Date(a.fecha).getTime();
+
+                const fechaB = new Date(b.fecha).getTime();
+
+                return fechaB - fechaA;
+
+            });
+
+    }, [pedidos, fechaDesde, fechaHasta]);
+
+
+    const totalPedidos = pedidosFiltrados.length;
+
+    const totalPaginas = Math.max(
+
+        1,
+
+        Math.ceil(
+
+            totalPedidos / PEDIDOS_POR_PAGINA
+
+        )
+
+    );
+
+
+    useEffect(() => {
+
+        if (paginaActual > totalPaginas) {
+
+            setPaginaActual(totalPaginas);
+
+        }
+
+    }, [paginaActual, totalPaginas]);
+
+
+    useEffect(() => {
+
+        setPaginaActual(1);
+
+    }, [fechaDesde, fechaHasta]);
+
+
+    const indiceInicial =
+
+        (paginaActual - 1) *
+
+        PEDIDOS_POR_PAGINA;
+
+    const indiceFinal =
+
+        indiceInicial +
+
+        PEDIDOS_POR_PAGINA;
+
+    const pedidosPagina = pedidosFiltrados.slice(
+
+        indiceInicial,
+
+        indiceFinal
+
+    );
+
+
     function alternarPedido(id) {
 
         setPedidoExpandido(
@@ -36,17 +193,6 @@ export default function PedidoTable({
 
     }
 
-    function editarPedido(pedido) {
-
-        console.log(
-
-            "Editar pedido:",
-
-            pedido
-
-        );
-
-    }
 
     function solicitarEliminacion(pedido) {
 
@@ -54,21 +200,27 @@ export default function PedidoTable({
 
     }
 
+
     function cancelarEliminacion() {
 
-        if (eliminando)
+        if (eliminando) {
 
             return;
+
+        }
 
         setPedidoAEliminar(null);
 
     }
 
+
     async function confirmarEliminacion() {
 
-        if (!pedidoAEliminar)
+        if (!pedidoAEliminar) {
 
             return;
+
+        }
 
         try {
 
@@ -80,6 +232,8 @@ export default function PedidoTable({
 
             );
 
+            setPedidoExpandido(null);
+
             setPedidoAEliminar(null);
 
             if (onActualizar) {
@@ -88,9 +242,7 @@ export default function PedidoTable({
 
             }
 
-        }
-
-        catch (error) {
+        } catch (error) {
 
             console.error(
 
@@ -106,15 +258,46 @@ export default function PedidoTable({
 
             );
 
-        }
-
-        finally {
+        } finally {
 
             setEliminando(false);
 
         }
 
     }
+
+
+    function limpiarFiltros() {
+
+        setFechaDesde("");
+
+        setFechaHasta("");
+
+        setPaginaActual(1);
+
+    }
+
+
+    function cambiarPagina(pagina) {
+
+        if (
+
+            pagina < 1 ||
+
+            pagina > totalPaginas
+
+        ) {
+
+            return;
+
+        }
+
+        setPaginaActual(pagina);
+
+        setPedidoExpandido(null);
+
+    }
+
 
     if (!pedidos.length) {
 
@@ -130,41 +313,345 @@ export default function PedidoTable({
 
     }
 
+
+    const primerPedido =
+
+        totalPedidos === 0
+
+            ? 0
+
+            : indiceInicial + 1;
+
+    const ultimoPedido = Math.min(
+
+        indiceFinal,
+
+        totalPedidos
+
+    );
+
+
     return (
 
         <>
 
-            <div className="pedido-listado">
+            <div className="pedido-filtros">
 
-                {
+                <div className="filtro-fecha">
 
-                    pedidos.map((pedido) => (
+                    <label htmlFor="fecha-desde">
 
-                        <PedidoCard
+                        Desde
 
-                            key={pedido.id}
+                    </label>
 
-                            pedido={pedido}
+                    <input
 
-                            expandido={
+                        id="fecha-desde"
 
-                                pedidoExpandido === pedido.id
+                        type="date"
+
+                        value={fechaDesde}
+
+                        max={fechaHasta || undefined}
+
+                        onChange={(e) =>
+
+                            setFechaDesde(
+
+                                e.target.value
+
+                            )
+
+                        }
+
+                    />
+
+                </div>
+
+
+                <div className="filtro-fecha">
+
+                    <label htmlFor="fecha-hasta">
+
+                        Hasta
+
+                    </label>
+
+                    <input
+
+                        id="fecha-hasta"
+
+                        type="date"
+
+                        value={fechaHasta}
+
+                        min={fechaDesde || undefined}
+
+                        onChange={(e) =>
+
+                            setFechaHasta(
+
+                                e.target.value
+
+                            )
+
+                        }
+
+                    />
+
+                </div>
+
+
+                <button
+
+                    type="button"
+
+                    className="btn-limpiar-filtros"
+
+                    onClick={limpiarFiltros}
+
+                    disabled={
+
+                        !fechaDesde &&
+
+                        !fechaHasta
+
+                    }
+
+                >
+
+                    Limpiar filtros
+
+                </button>
+
+            </div>
+
+
+            <div className="pedido-resumen-lista">
+
+                <span>
+
+                    {
+
+                        totalPedidos === 0
+
+                            ? "No hay pedidos para el periodo seleccionado."
+
+                            : `Mostrando ${primerPedido}–${ultimoPedido} de ${totalPedidos} pedidos`
+
+                    }
+
+                </span>
+
+                <span className="orden-pedidos">
+
+                    Más recientes primero
+
+                </span>
+
+            </div>
+
+
+            {
+
+                totalPedidos === 0
+
+                    ?
+
+                    (
+
+                        <div className="pedido-table-vacio">
+
+                            No hay pedidos para las fechas seleccionadas.
+
+                        </div>
+
+                    )
+
+                    :
+
+                    (
+
+                        <div className="pedido-listado">
+
+                            {
+
+                                pedidosPagina.map(
+
+                                    (pedido) => (
+
+                                        <PedidoCard
+
+                                            key={pedido.id}
+
+                                            pedido={pedido}
+
+                                            expandido={
+
+                                                pedidoExpandido ===
+
+                                                pedido.id
+
+                                            }
+
+                                            onExpandir={
+
+                                                alternarPedido
+
+                                            }
+
+                                            onEliminar={
+
+                                                solicitarEliminacion
+
+                                            }
+
+                                        />
+
+                                    )
+
+                                )
 
                             }
 
-                            onExpandir={alternarPedido}
+                        </div>
 
-                            onEditar={editarPedido}
+                    )
 
-                            onEliminar={solicitarEliminacion}
+            }
 
-                        />
 
-                    ))
+            {
 
-                }
+                totalPedidos > 0 && (
 
-            </div>
+                    <div className="paginacion-pedidos">
+
+                        <button
+
+                            type="button"
+
+                            className="btn-paginacion"
+
+                            disabled={
+
+                                paginaActual === 1
+
+                            }
+
+                            onClick={() =>
+
+                                cambiarPagina(
+
+                                    paginaActual - 1
+
+                                )
+
+                            }
+
+                        >
+
+                            ← Anterior
+
+                        </button>
+
+
+                        <div className="paginas">
+
+                            {
+
+                                Array.from(
+
+                                    {
+
+                                        length: totalPaginas
+
+                                    },
+
+                                    (_, index) =>
+
+                                        index + 1
+
+                                ).map((pagina) => (
+
+                                    <button
+
+                                        key={pagina}
+
+                                        type="button"
+
+                                        className={
+
+                                            pagina ===
+
+                                            paginaActual
+
+                                                ? "pagina activa"
+
+                                                : "pagina"
+
+                                        }
+
+                                        onClick={() =>
+
+                                            cambiarPagina(
+
+                                                pagina
+
+                                            )
+
+                                        }
+
+                                    >
+
+                                        {pagina}
+
+                                    </button>
+
+                                ))
+
+                            }
+
+                        </div>
+
+
+                        <button
+
+                            type="button"
+
+                            className="btn-paginacion"
+
+                            disabled={
+
+                                paginaActual ===
+
+                                totalPaginas
+
+                            }
+
+                            onClick={() =>
+
+                                cambiarPagina(
+
+                                    paginaActual + 1
+
+                                )
+
+                            }
+
+                        >
+
+                            Siguiente →
+
+                        </button>
+
+                    </div>
+
+                )
+
+            }
+
 
             <ConfirmDialog
 
@@ -218,6 +705,7 @@ export default function PedidoTable({
 
                             </p>
 
+
                             <strong>
 
                                 Total
@@ -240,6 +728,7 @@ export default function PedidoTable({
 
                             </p>
 
+
                             <strong>
 
                                 Estado
@@ -251,6 +740,25 @@ export default function PedidoTable({
                                 {
 
                                     pedidoAEliminar.estado
+
+                                }
+
+                            </p>
+
+
+                            <strong>
+
+                                Productos
+
+                            </strong>
+
+                            <p>
+
+                                {
+
+                                    pedidoAEliminar.detalles
+
+                                        ?.length ?? 0
 
                                 }
 

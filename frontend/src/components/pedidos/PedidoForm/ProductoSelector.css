@@ -1,232 +1,507 @@
-import "./ProductoSelector.css";
+.separador-productos {
 
-export default function ProductoSelector({
+    margin: 28px 0 20px;
 
-    productos,
+    border: 0;
 
-    productoSeleccionado,
+    border-top: 1px solid #e5e7eb;
 
-    setProductoSeleccionado,
+}
 
-    cantidad,
 
-    setCantidad,
+.titulo-productos {
 
-    prestados,
+    margin: 0 0 18px;
 
-    setPrestados,
+    color: #174a73;
 
-    onAgregarProducto
+    font-family:
 
-}) {
+        Inter,
 
-    const datosValidos =
-        productoSeleccionado &&
-        cantidad > 0 &&
-        prestados >= 0 &&
-        prestados <= cantidad;
+        "Segoe UI",
 
-    return (
+        Roboto,
 
-        <>
+        Helvetica,
 
-            <hr className="separador-productos" />
+        Arial,
 
-            <h3 className="titulo-productos">
-                Selecciona un producto
-            </h3>
+        sans-serif;
 
-            <div className="selector-productos">
+    font-size: 1rem;
 
-                {
+    font-weight: 700;
 
-                    productos.map(producto => {
+}
 
-                        const seleccionado =
-                            productoSeleccionado?.id === producto.id;
 
-                        return (
+/* ==========================================================
+   TARJETAS DE PRODUCTOS
+   ========================================================== */
 
-                            <div
+.selector-productos {
 
-                                key={producto.id}
+    display: grid;
 
-                                className={
-                                    seleccionado
-                                        ? "producto-card seleccionado"
-                                        : "producto-card"
-                                }
+    grid-template-columns:
 
-                                onClick={() =>
-                                    setProductoSeleccionado(producto)
-                                }
+        repeat(3, minmax(0, 1fr));
 
-                            >
+    gap: 18px;
 
-                                {
+    width: 100%;
 
-                                    seleccionado &&
+    align-items: start;
 
-                                    <div className="check">
+}
 
-                                        ✓
 
-                                    </div>
+.producto-card {
 
-                                }
+    position: relative;
 
-                                <img
+    min-width: 0;
 
-                                    src={`/productos/${producto.imagen}`}
+    box-sizing: border-box;
 
-                                    alt={producto.marca}
+    padding: 18px;
 
-                                    className="producto-imagen"
+    background: #ffffff;
 
-                                />
+    border: 2px solid #dbe3ea;
 
-                                <h4>
+    border-radius: 15px;
 
-                                    {producto.marca}
+    text-align: center;
 
-                                </h4>
+    cursor: pointer;
 
-                                <p>
+    box-shadow:
 
-                                    {producto.capacidadLitros} L
+        0 2px 8px rgba(0, 0, 0, .05);
 
-                                </p>
+    transition:
 
-                                <div className="precio">
+        border-color .2s ease,
 
-                                    ${Number(producto.precio).toFixed(2)}
+        box-shadow .2s ease,
 
-                                </div>
+        transform .2s ease;
 
-                                {
+}
 
-                                    seleccionado &&
 
-                                    <>
+.producto-card:hover {
 
-                                        <div className="inputs-card">
+    border-color: #7db7d8;
 
-                                            <div>
+    box-shadow:
 
-                                                <label>
+        0 5px 14px rgba(0, 0, 0, .08);
 
-                                                    Cantidad
+    transform: translateY(-2px);
 
-                                                </label>
+}
 
-                                                <input
 
-                                                    type="number"
+.producto-card.seleccionado {
 
-                                                    min="1"
+    border-color: #0066a8;
 
-                                                    value={cantidad}
+    box-shadow:
 
-                                                    onClick={(e)=>e.stopPropagation()}
+        0 0 0 3px rgba(
 
-                                                    onChange={(e)=>
+            0,
 
-                                                        setCantidad(
+            102,
 
-                                                            Number(e.target.value)
+            168,
 
-                                                        )
+            .10
 
-                                                    }
+        ),
 
-                                                />
+        0 5px 15px rgba(0, 0, 0, .08);
 
-                                            </div>
+}
 
-                                            <div>
 
-                                                <label>
+/* ==========================================================
+   MARCA Y PRODUCTO
+   ========================================================== */
 
-                                                    Garrafones prestados
+.producto-imagen {
 
-                                                </label>
+    display: block;
 
-                                                <input
+    width: 115px;
 
-                                                    type="number"
+    height: 115px;
 
-                                                    min="0"
+    object-fit: contain;
 
-                                                    value={prestados}
+    margin: 0 auto 10px;
 
-                                                    onClick={(e)=>e.stopPropagation()}
+}
 
-                                                    onChange={(e)=>
 
-                                                        setPrestados(
+.producto-card h4 {
 
-                                                            Number(e.target.value)
+    margin: 5px 0 5px;
 
-                                                        )
+    color: #1f2937;
 
-                                                    }
+    font-family:
 
-                                                />
+        Inter,
 
-                                                {
+        "Segoe UI",
 
-                                                    prestados > cantidad &&
+        Roboto,
 
-                                                    <small className="input-error">
+        Helvetica,
 
-                                                        Los prestados no pueden ser mayores que la cantidad comprada.
+        Arial,
 
-                                                    </small>
+        sans-serif;
 
-                                                }
+    font-size: 1rem;
 
-                                            </div>
+    font-weight: 700;
 
-                                        </div>
+}
 
-                                        <button
 
-                                            type="button"
+.producto-card > p {
 
-                                            className="btn-agregar"
+    margin: 0 0 7px;
 
-                                            disabled={!datosValidos}
+    color: #64748b;
 
-                                            onClick={(e)=>{
+    font-family:
 
-                                                e.stopPropagation();
+        Inter,
 
-                                                onAgregarProducto();
+        "Segoe UI",
 
-                                            }}
+        Roboto,
 
-                                        >
+        Helvetica,
 
-                                            + Agregar al pedido
+        Arial,
 
-                                        </button>
+        sans-serif;
 
-                                    </>
+    font-size: .85rem;
 
-                                }
+}
 
-                            </div>
 
-                        );
+.precio {
 
-                    })
+    color: #009f8f;
 
-                }
+    font-family:
 
-            </div>
+        Inter,
 
-        </>
+        "Segoe UI",
 
-    );
+        Roboto,
+
+        Helvetica,
+
+        Arial,
+
+        sans-serif;
+
+    font-size: 1rem;
+
+    font-weight: 700;
+
+}
+
+
+/* ==========================================================
+   MARCA DE SELECCIÓN
+   ========================================================== */
+
+.check {
+
+    position: absolute;
+
+    top: 10px;
+
+    right: 10px;
+
+    width: 27px;
+
+    height: 27px;
+
+    display: flex;
+
+    align-items: center;
+
+    justify-content: center;
+
+    border-radius: 50%;
+
+    background: #0066a8;
+
+    color: #ffffff;
+
+    font-size: .85rem;
+
+    font-weight: 700;
+
+}
+
+
+/* ==========================================================
+   CONFIGURACIÓN DE PRODUCTO
+   ========================================================== */
+
+.producto-configuracion {
+
+    margin-top: 16px;
+
+    padding-top: 15px;
+
+    border-top: 1px solid #e5e7eb;
+
+}
+
+
+.inputs-card {
+
+    display: grid;
+
+    grid-template-columns: 1fr 1fr;
+
+    gap: 10px;
+
+    text-align: left;
+
+}
+
+
+.inputs-card > div {
+
+    min-width: 0;
+
+}
+
+
+.inputs-card label {
+
+    display: block;
+
+    margin-bottom: 5px;
+
+    color: #374151;
+
+    font-family:
+
+        Inter,
+
+        "Segoe UI",
+
+        Roboto,
+
+        Helvetica,
+
+        Arial,
+
+        sans-serif;
+
+    font-size: .76rem;
+
+    font-weight: 600;
+
+}
+
+
+.inputs-card input {
+
+    width: 100%;
+
+    min-height: 38px;
+
+    box-sizing: border-box;
+
+    padding: 7px 9px;
+
+    border: 1px solid #cbd5e1;
+
+    border-radius: 8px;
+
+    background: #ffffff;
+
+    color: #1f2937;
+
+    font-family:
+
+        Inter,
+
+        "Segoe UI",
+
+        Roboto,
+
+        Helvetica,
+
+        Arial,
+
+        sans-serif;
+
+    font-size: .88rem;
+
+    outline: none;
+
+}
+
+
+.inputs-card input:focus {
+
+    border-color: #0078b8;
+
+    box-shadow:
+
+        0 0 0 3px rgba(
+
+            0,
+
+            120,
+
+            184,
+
+            .10
+
+        );
+
+}
+
+
+/* ==========================================================
+   ERROR
+   ========================================================== */
+
+.input-error {
+
+    display: block;
+
+    margin-top: 5px;
+
+    color: #dc2626;
+
+    font-size: .7rem;
+
+    line-height: 1.3;
+
+}
+
+
+/* ==========================================================
+   BOTÓN AGREGAR
+   ========================================================== */
+
+.btn-agregar {
+
+    width: 100%;
+
+    margin-top: 12px;
+
+    padding: 10px 12px;
+
+    border: none;
+
+    border-radius: 9px;
+
+    background: #005A9C;
+
+    color: #ffffff;
+
+    font-family:
+
+        Inter,
+
+        "Segoe UI",
+
+        Roboto,
+
+        Helvetica,
+
+        Arial,
+
+        sans-serif;
+
+    font-size: .82rem;
+
+    font-weight: 600;
+
+    cursor: pointer;
+
+    transition:
+
+        background .2s ease,
+
+        opacity .2s ease,
+
+        transform .15s ease;
+
+}
+
+
+.btn-agregar:hover:not(:disabled) {
+
+    background: #0078D4;
+
+    transform: translateY(-1px);
+
+}
+
+
+.btn-agregar:disabled {
+
+    opacity: .45;
+
+    cursor: not-allowed;
+
+}
+
+
+/* ==========================================================
+   RESPONSIVE
+   ========================================================== */
+
+@media (max-width: 900px) {
+
+    .selector-productos {
+
+        grid-template-columns:
+
+            repeat(2, minmax(0, 1fr));
+
+    }
+
+}
+
+
+@media (max-width: 600px) {
+
+    .selector-productos {
+
+        grid-template-columns: 1fr;
+
+    }
+
+    .producto-imagen {
+
+        width: 125px;
+
+        height: 125px;
+
+    }
 
 }

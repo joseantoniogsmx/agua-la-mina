@@ -1,14 +1,16 @@
 import {
-
     get,
-
     post,
-
     put,
-
     del
-
 } from "./api";
+
+
+/*
+ * ==========================================================
+ * CONSULTAS
+ * ==========================================================
+ */
 
 export async function obtenerPedidos() {
 
@@ -22,17 +24,38 @@ export async function obtenerPedido(id) {
 
 }
 
+
+/*
+ * ==========================================================
+ * CREACIÓN
+ * ==========================================================
+ */
+
 export async function crearPedido(datos) {
 
     return await post("/pedidos", datos);
 
 }
 
+
+/*
+ * ==========================================================
+ * ACTUALIZACIÓN
+ * ==========================================================
+ */
+
 export async function actualizarPedido(id, datos) {
 
     return await put(`/pedidos/${id}`, datos);
 
 }
+
+
+/*
+ * ==========================================================
+ * ELIMINACIÓN
+ * ==========================================================
+ */
 
 export async function eliminarPedido(id) {
 

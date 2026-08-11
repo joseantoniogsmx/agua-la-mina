@@ -14,13 +14,19 @@ export default function ClienteSelector({
 
     return (
 
-        <div className="controles">
+        <div className="cliente-prioridad">
 
-            <div>
+            <div className="campo-pedido">
 
-                <label>Cliente</label>
+                <label htmlFor="cliente">
+
+                    Cliente
+
+                </label>
 
                 <select
+
+                    id="cliente"
 
                     value={clienteSeleccionado}
 
@@ -31,7 +37,9 @@ export default function ClienteSelector({
                 >
 
                     <option value="">
+
                         Selecciona un cliente
+
                     </option>
 
                     {
@@ -58,11 +66,18 @@ export default function ClienteSelector({
 
             </div>
 
-            <div>
 
-                <label>Prioridad</label>
+            <div className="campo-pedido">
+
+                <label htmlFor="prioridad">
+
+                    Prioridad
+
+                </label>
 
                 <select
+
+                    id="prioridad"
 
                     value={prioridad}
 
