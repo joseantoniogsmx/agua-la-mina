@@ -397,11 +397,16 @@ public class RutaService {
 
         /*
          * Eliminamos IDs duplicados.
+         *
+         * Se devuelve una nueva ArrayList para que
+         * posteriormente pueda ser ordenada con sort().
          */
-        return pedidos
-                .stream()
-                .distinct()
-                .toList();
+        return new ArrayList<>(
+                pedidos
+                        .stream()
+                        .distinct()
+                        .toList()
+        );
 
     }
 

@@ -1,0 +1,904 @@
+/* =========================================================
+   PÁGINA DE RUTA
+   ========================================================= */
+
+.ruta-page {
+
+    padding: 10px;
+
+}
+
+
+/* =========================================================
+   ENCABEZADO
+   ========================================================= */
+
+.ruta-header {
+
+    display: flex;
+
+    justify-content: space-between;
+
+    align-items: center;
+
+    margin-bottom: 30px;
+
+}
+
+
+.ruta-header h1 {
+
+    color: #003B73;
+
+    margin: 0 0 6px 0;
+
+    font-size: 30px;
+
+    font-weight: 700;
+
+}
+
+
+.ruta-header p {
+
+    margin: 0;
+
+    color: #6B7280;
+
+    font-size: 15px;
+
+}
+
+
+/* =========================================================
+   PANEL PRINCIPAL
+   ========================================================= */
+
+.ruta-panel {
+
+    background: #FFFFFF;
+
+    border: 1px solid #E5E7EB;
+
+    border-radius: 16px;
+
+    box-shadow: 0 4px 14px rgba(0, 0, 0, 0.06);
+
+    margin-bottom: 24px;
+
+    overflow: hidden;
+
+}
+
+
+/* =========================================================
+   CABECERA DEL PANEL
+   ========================================================= */
+
+.ruta-panel-header {
+
+    display: flex;
+
+    justify-content: space-between;
+
+    align-items: center;
+
+    gap: 20px;
+
+    padding: 22px 24px;
+
+    border-bottom: 1px solid #E5E7EB;
+
+}
+
+
+.ruta-panel-header h2 {
+
+    margin: 0 0 5px 0;
+
+    color: #003B73;
+
+    font-size: 20px;
+
+    font-weight: 700;
+
+}
+
+
+.ruta-panel-header p {
+
+    margin: 0;
+
+    color: #6B7280;
+
+    font-size: 14px;
+
+}
+
+
+/* =========================================================
+   ACCIONES
+   ========================================================= */
+
+.ruta-acciones {
+
+    display: flex;
+
+    align-items: center;
+
+    gap: 10px;
+
+}
+
+
+/* =========================================================
+   BOTONES
+   ========================================================= */
+
+.btn-primary {
+
+    background: #005A9C;
+
+    color: #FFFFFF;
+
+    border: none;
+
+    padding: 12px 22px;
+
+    border-radius: 10px;
+
+    cursor: pointer;
+
+    font-weight: 600;
+
+    font-size: 14px;
+
+    transition:
+        background 0.2s ease,
+        transform 0.15s ease,
+        opacity 0.2s ease;
+
+}
+
+
+.btn-primary:hover:not(:disabled) {
+
+    background: #0078D4;
+
+    transform: translateY(-1px);
+
+}
+
+
+.btn-primary:disabled {
+
+    opacity: 0.55;
+
+    cursor: not-allowed;
+
+}
+
+
+.btn-secundario {
+
+    background: #FFFFFF;
+
+    color: #374151;
+
+    border: 1px solid #D1D5DB;
+
+    padding: 11px 17px;
+
+    border-radius: 10px;
+
+    cursor: pointer;
+
+    font-weight: 600;
+
+    font-size: 13px;
+
+    transition:
+        background 0.2s ease,
+        border-color 0.2s ease,
+        color 0.2s ease;
+
+}
+
+
+.btn-secundario:hover:not(:disabled) {
+
+    background: #F3F4F6;
+
+    border-color: #9CA3AF;
+
+}
+
+
+.btn-secundario:disabled {
+
+    opacity: 0.5;
+
+    cursor: not-allowed;
+
+}
+
+
+/* =========================================================
+   LISTADO DE PEDIDOS
+   ========================================================= */
+
+.ruta-pedidos {
+
+    display: grid;
+
+    grid-template-columns:
+        repeat(
+            auto-fit,
+            minmax(320px, 1fr)
+        );
+
+    gap: 14px;
+
+    padding: 22px 24px;
+
+}
+
+
+/* =========================================================
+   TARJETA DE PEDIDO
+   ========================================================= */
+
+.ruta-pedido {
+
+    display: flex;
+
+    align-items: flex-start;
+
+    gap: 14px;
+
+    padding: 17px;
+
+    background: #FFFFFF;
+
+    border: 1px solid #E5E7EB;
+
+    border-radius: 13px;
+
+    cursor: pointer;
+
+    transition:
+        border-color 0.2s ease,
+        background 0.2s ease,
+        box-shadow 0.2s ease,
+        transform 0.15s ease;
+
+}
+
+
+.ruta-pedido:hover {
+
+    border-color: #93C5FD;
+
+    background: #F8FBFF;
+
+    transform: translateY(-1px);
+
+}
+
+
+.ruta-pedido.seleccionado {
+
+    border-color: #005A9C;
+
+    background: #F0F7FF;
+
+    box-shadow:
+        0 0 0 2px rgba(
+            0,
+            90,
+            156,
+            0.10
+        );
+
+}
+
+
+/* =========================================================
+   CHECKBOX
+   ========================================================= */
+
+.ruta-pedido-check {
+
+    padding-top: 2px;
+
+    flex-shrink: 0;
+
+}
+
+
+.ruta-pedido-check input {
+
+    width: 18px;
+
+    height: 18px;
+
+    accent-color: #005A9C;
+
+    cursor: pointer;
+
+}
+
+
+/* =========================================================
+   INFORMACIÓN DEL PEDIDO
+   ========================================================= */
+
+.ruta-pedido-info {
+
+    min-width: 0;
+
+    flex: 1;
+
+}
+
+
+.ruta-pedido-titulo {
+
+    display: flex;
+
+    align-items: center;
+
+    gap: 9px;
+
+    margin-bottom: 7px;
+
+}
+
+
+.ruta-pedido-titulo strong {
+
+    color: #111827;
+
+    font-size: 15px;
+
+}
+
+
+.ruta-cliente {
+
+    color: #003B73;
+
+    font-weight: 600;
+
+    font-size: 15px;
+
+    margin-bottom: 4px;
+
+}
+
+
+.ruta-direccion {
+
+    color: #6B7280;
+
+    font-size: 13px;
+
+    line-height: 1.45;
+
+    margin-bottom: 10px;
+
+}
+
+
+.ruta-productos {
+
+    color: #374151;
+
+    font-size: 13px;
+
+    line-height: 1.45;
+
+    background: #F9FAFB;
+
+    border-radius: 8px;
+
+    padding: 8px 10px;
+
+}
+
+
+.ruta-pedido-meta {
+
+    display: flex;
+
+    justify-content: space-between;
+
+    align-items: center;
+
+    gap: 10px;
+
+    margin-top: 11px;
+
+    color: #6B7280;
+
+    font-size: 12px;
+
+}
+
+
+.ruta-pedido-meta span:last-child {
+
+    color: #111827;
+
+    font-weight: 700;
+
+}
+
+
+/* =========================================================
+   PRIORIDAD
+   ========================================================= */
+
+.ruta-prioridad {
+
+    display: inline-flex;
+
+    align-items: center;
+
+    padding: 3px 8px;
+
+    border-radius: 999px;
+
+    font-size: 10px;
+
+    font-weight: 700;
+
+    letter-spacing: 0.3px;
+
+}
+
+
+.ruta-prioridad.urgente {
+
+    background: #FEE2E2;
+
+    color: #B91C1C;
+
+}
+
+
+/* =========================================================
+   PIE DEL PANEL
+   ========================================================= */
+
+.ruta-panel-footer {
+
+    display: flex;
+
+    justify-content: space-between;
+
+    align-items: center;
+
+    gap: 20px;
+
+    padding: 18px 24px;
+
+    border-top: 1px solid #E5E7EB;
+
+    background: #F9FAFB;
+
+}
+
+
+.ruta-panel-footer > span {
+
+    color: #6B7280;
+
+    font-size: 14px;
+
+    font-weight: 600;
+
+}
+
+
+/* =========================================================
+   CARGANDO / VACÍO
+   ========================================================= */
+
+.ruta-cargando,
+.ruta-vacio {
+
+    padding: 50px 24px;
+
+    text-align: center;
+
+    color: #6B7280;
+
+    font-size: 15px;
+
+}
+
+
+.ruta-vacio {
+
+    background: #F9FAFB;
+
+}
+
+
+/* =========================================================
+   ERROR
+   ========================================================= */
+
+.ruta-error {
+
+    background: #FEF2F2;
+
+    border: 1px solid #FECACA;
+
+    color: #B91C1C;
+
+    border-radius: 10px;
+
+    padding: 13px 16px;
+
+    margin-bottom: 20px;
+
+    font-size: 14px;
+
+    font-weight: 500;
+
+}
+
+
+/* =========================================================
+   PROPUESTA DE RUTA
+   ========================================================= */
+
+.ruta-propuesta {
+
+    border-color: #BFDBFE;
+
+}
+
+
+.ruta-resumen {
+
+    display: grid;
+
+    grid-template-columns:
+        repeat(
+            3,
+            1fr
+        );
+
+    gap: 1px;
+
+    background: #E5E7EB;
+
+    border-bottom: 1px solid #E5E7EB;
+
+}
+
+
+.ruta-resumen-item {
+
+    display: flex;
+
+    flex-direction: column;
+
+    align-items: center;
+
+    justify-content: center;
+
+    gap: 4px;
+
+    min-height: 90px;
+
+    background: #FFFFFF;
+
+}
+
+
+.ruta-resumen-item strong {
+
+    color: #003B73;
+
+    font-size: 21px;
+
+    font-weight: 700;
+
+}
+
+
+.ruta-resumen-item span {
+
+    color: #6B7280;
+
+    font-size: 12px;
+
+}
+
+
+/* =========================================================
+   RECORRIDO
+   ========================================================= */
+
+.ruta-recorrido {
+
+    padding: 25px 30px;
+
+}
+
+
+.ruta-punto {
+
+    position: relative;
+
+    display: flex;
+
+    align-items: flex-start;
+
+    gap: 14px;
+
+    padding: 0 0 25px 0;
+
+}
+
+
+.ruta-punto:not(:last-child)::after {
+
+    content: "";
+
+    position: absolute;
+
+    left: 16px;
+
+    top: 34px;
+
+    bottom: 0;
+
+    width: 2px;
+
+    background: #D1D5DB;
+
+}
+
+
+.ruta-punto-numero {
+
+    position: relative;
+
+    z-index: 2;
+
+    width: 34px;
+
+    height: 34px;
+
+    flex-shrink: 0;
+
+    display: flex;
+
+    align-items: center;
+
+    justify-content: center;
+
+    border-radius: 50%;
+
+    background: #005A9C;
+
+    color: #FFFFFF;
+
+    font-size: 13px;
+
+    font-weight: 700;
+
+}
+
+
+.ruta-punto.inicio {
+
+    padding-bottom: 25px;
+
+}
+
+
+.ruta-punto.inicio .ruta-punto-numero {
+
+    background: #003B73;
+
+    font-size: 16px;
+
+}
+
+
+.ruta-punto > div:last-child {
+
+    display: flex;
+
+    flex-direction: column;
+
+    gap: 4px;
+
+    padding-top: 2px;
+
+}
+
+
+.ruta-punto strong {
+
+    color: #111827;
+
+    font-size: 15px;
+
+}
+
+
+.ruta-punto span {
+
+    color: #6B7280;
+
+    font-size: 13px;
+
+    line-height: 1.4;
+
+}
+
+
+.ruta-punto small {
+
+    color: #374151;
+
+    font-size: 12px;
+
+    margin-top: 3px;
+
+}
+
+
+/* =========================================================
+   PIE DE PROPUESTA
+   ========================================================= */
+
+.ruta-propuesta-footer {
+
+    display: flex;
+
+    justify-content: flex-end;
+
+    align-items: center;
+
+    gap: 10px;
+
+    padding: 18px 24px;
+
+    background: #F9FAFB;
+
+    border-top: 1px solid #E5E7EB;
+
+}
+
+
+/* =========================================================
+   RESPONSIVE
+   ========================================================= */
+
+@media (max-width: 800px) {
+
+    .ruta-panel-header {
+
+        flex-direction: column;
+
+        align-items: flex-start;
+
+    }
+
+
+    .ruta-acciones {
+
+        width: 100%;
+
+        flex-wrap: wrap;
+
+    }
+
+
+    .ruta-pedidos {
+
+        grid-template-columns: 1fr;
+
+    }
+
+
+    .ruta-resumen {
+
+        grid-template-columns: 1fr;
+
+    }
+
+
+    .ruta-resumen-item {
+
+        min-height: 70px;
+
+    }
+
+
+    .ruta-panel-footer {
+
+        flex-direction: column;
+
+        align-items: stretch;
+
+    }
+
+
+    .ruta-panel-footer .btn-primary {
+
+        width: 100%;
+
+    }
+
+
+    .ruta-propuesta-footer {
+
+        flex-direction: column-reverse;
+
+        align-items: stretch;
+
+    }
+
+
+    .ruta-propuesta-footer button {
+
+        width: 100%;
+
+    }
+
+}
+
+
+@media (max-width: 500px) {
+
+    .ruta-page {
+
+        padding: 5px;
+
+    }
+
+
+    .ruta-header h1 {
+
+        font-size: 25px;
+
+    }
+
+
+    .ruta-panel-header {
+
+        padding: 18px;
+
+    }
+
+
+    .ruta-pedidos {
+
+        padding: 16px;
+
+    }
+
+
+    .ruta-pedido {
+
+        padding: 14px;
+
+    }
+
+
+    .ruta-recorrido {
+
+        padding: 22px 18px;
+
+    }
+
+}

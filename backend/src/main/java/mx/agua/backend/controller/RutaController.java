@@ -2,9 +2,14 @@ package mx.agua.backend.controller;
 
 import mx.agua.backend.dto.request.GenerarRutaRequest;
 import mx.agua.backend.dto.request.IniciarRutaRequest;
+import mx.agua.backend.model.Pedido;
 import mx.agua.backend.service.routing.RutaService;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 
 @RestController
 @RequestMapping("/ruta")
@@ -12,6 +17,7 @@ import org.springframework.web.bind.annotation.*;
 public class RutaController {
 
     private final RutaService rutaService;
+
 
     public RutaController(RutaService rutaService) {
 
@@ -68,11 +74,32 @@ public class RutaController {
 
         try {
 
-            return ResponseEntity.ok(
+            List<Pedido> pedidos =
                     rutaService.iniciarRuta(
                             request.getPedidoIds()
-                    )
+                    );
+
+
+            Map<String, Object> respuesta =
+                    new HashMap<>();
+
+
+            respuesta.put(
+                    "mensaje",
+                    "Ruta iniciada correctamente."
             );
+
+
+            respuesta.put(
+                    "pedidos",
+                    pedidos.size()
+            );
+
+
+            return ResponseEntity.ok(
+                    respuesta
+            );
+
 
         } catch (IllegalArgumentException ex) {
 
