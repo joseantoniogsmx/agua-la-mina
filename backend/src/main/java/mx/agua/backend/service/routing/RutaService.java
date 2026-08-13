@@ -5,10 +5,12 @@ import mx.agua.backend.dto.response.DetallePedidoResponse;
 import mx.agua.backend.dto.response.PedidoResponse;
 import mx.agua.backend.dto.response.RutaResponse;
 import mx.agua.backend.model.DetallePedido;
+import mx.agua.backend.model.Envio;
 import mx.agua.backend.model.Pedido;
 import mx.agua.backend.model.PedidoEstado;
 import mx.agua.backend.repository.PedidoRepository;
 import mx.agua.backend.service.ConfiguracionService;
+import mx.agua.backend.service.EnvioService;
 import mx.agua.backend.service.routing.dto.OsrmResponse;
 import mx.agua.backend.service.routing.dto.Route;
 import org.springframework.stereotype.Service;
@@ -28,17 +30,19 @@ public class RutaService {
 
     private final OsrmService osrmService;
 
+    private final EnvioService envioService;
+
 
     public RutaService(
             PedidoRepository pedidoRepository,
             ConfiguracionService configuracionService,
-            OsrmService osrmService) {
+            OsrmService osrmService,
+            EnvioService envioService) {
 
         this.pedidoRepository = pedidoRepository;
-
         this.configuracionService = configuracionService;
-
         this.osrmService = osrmService;
+        this.envioService = envioService;
 
     }
 
@@ -62,6 +66,7 @@ public class RutaService {
                 configuracionService
                         .obtenerLatitudPurificadora();
 
+
         Double lonPurificadora =
                 configuracionService
                         .obtenerLongitudPurificadora();
@@ -84,7 +89,6 @@ public class RutaService {
                         pedido -> calcularDistanciaCuadrada(
 
                                 latPurificadora,
-
                                 lonPurificadora,
 
                                 pedido.getCliente()
@@ -123,9 +127,7 @@ public class RutaService {
                 osrmService.obtenerRuta(
 
                         latPurificadora,
-
                         lonPurificadora,
-
                         pedidosOrdenados
 
                 );
@@ -209,8 +211,8 @@ public class RutaService {
     /**
      * Confirma e inicia una ruta.
      *
-     * Solamente los pedidos seleccionados pasan
-     * de PENDIENTE a EN_RUTA.
+     * Además de cambiar los pedidos a EN_RUTA,
+     * crea el envío correspondiente.
      */
     public List<Pedido> iniciarRuta(
             List<Integer> pedidoIds) {
@@ -220,19 +222,27 @@ public class RutaService {
 
 
         /*
-         * Ordenamos nuevamente los pedidos para
-         * garantizar que el orden almacenado sea
-         * consistente con la propuesta.
+         * Obtenemos las coordenadas de la
+         * purificadora.
          */
         Double latPurificadora =
                 configuracionService
                         .obtenerLatitudPurificadora();
+
 
         Double lonPurificadora =
                 configuracionService
                         .obtenerLongitudPurificadora();
 
 
+        /*
+         * Ordenamos inicialmente los pedidos
+         * desde la purificadora.
+         *
+         * Por ahora conservamos el algoritmo
+         * actual. Más adelante lo sustituiremos
+         * por el algoritmo de ruta optimizada.
+         */
         pedidos.sort(
 
                 Comparator.comparingDouble(
@@ -240,7 +250,6 @@ public class RutaService {
                         pedido -> calcularDistanciaCuadrada(
 
                                 latPurificadora,
-
                                 lonPurificadora,
 
                                 pedido.getCliente()
@@ -256,6 +265,9 @@ public class RutaService {
         );
 
 
+        /*
+         * Asignamos el orden de entrega.
+         */
         int orden = 1;
 
         for (Pedido pedido : pedidos) {
@@ -269,7 +281,114 @@ public class RutaService {
         }
 
 
-        return pedidoRepository.saveAll(pedidos);
+        /*
+         * Calculamos nuevamente la ruta real
+         * utilizando OSRM.
+         */
+        OsrmResponse osrmResponse =
+
+                osrmService.obtenerRuta(
+
+                        latPurificadora,
+                        lonPurificadora,
+                        pedidos
+
+                );
+
+
+        if (osrmResponse == null) {
+
+            throw new IllegalStateException(
+                    "No fue posible calcular la ruta del envío."
+            );
+
+        }
+
+
+        if (!"Ok".equalsIgnoreCase(
+                osrmResponse.getCode())) {
+
+            throw new IllegalStateException(
+                    "OSRM no pudo calcular la ruta del envío."
+            );
+
+        }
+
+
+        if (osrmResponse.getRoutes() == null
+                || osrmResponse.getRoutes().isEmpty()) {
+
+            throw new IllegalStateException(
+                    "OSRM no devolvió una ruta válida para el envío."
+            );
+
+        }
+
+
+        Route ruta =
+
+                osrmResponse
+                        .getRoutes()
+                        .get(0);
+
+
+        BigDecimal distanciaKm =
+
+                BigDecimal.valueOf(
+                        ruta.getDistance() / 1000.0
+                )
+                .setScale(
+                        2,
+                        RoundingMode.HALF_UP
+                );
+
+
+        long duracionMinutos =
+
+                Math.round(
+                        ruta.getDuration() / 60.0
+                );
+
+
+        /*
+         * Creamos el envío.
+         *
+         * Esto genera el folio y asocia
+         * los pedidos seleccionados.
+         */
+        Envio envio =
+
+                envioService.crearEnvio(
+
+                        pedidos,
+                        distanciaKm,
+                        duracionMinutos
+
+                );
+
+
+        /*
+         * Guardamos los pedidos con su nuevo
+         * estado, orden y envío asociado.
+         */
+        pedidoRepository.saveAll(pedidos);
+
+
+        /*
+         * Evitamos una advertencia de variable
+         * no utilizada y dejamos explícito que
+         * el envío fue creado correctamente.
+         */
+        if (envio == null) {
+
+            throw new IllegalStateException(
+                    "No fue posible crear el envío."
+            );
+
+        }
+
+
+        return pedidos;
 
     }
 
@@ -296,6 +415,7 @@ public class RutaService {
         Double latPurificadora =
                 configuracionService
                         .obtenerLatitudPurificadora();
+
 
         Double lonPurificadora =
                 configuracionService

@@ -24,8 +24,12 @@ public class PedidoResponse {
 
     private String notas;
 
+    private Integer ordenRuta;
+
+
     public PedidoResponse() {
     }
+
 
     public Integer getId() {
         return id;
@@ -35,6 +39,7 @@ public class PedidoResponse {
         this.id = id;
     }
 
+
     public ClienteResponse getCliente() {
         return cliente;
     }
@@ -42,6 +47,7 @@ public class PedidoResponse {
     public void setCliente(ClienteResponse cliente) {
         this.cliente = cliente;
     }
+
 
     public List<DetallePedidoResponse> getDetalles() {
         return detalles;
@@ -51,6 +57,7 @@ public class PedidoResponse {
         this.detalles = detalles;
     }
 
+
     public BigDecimal getTotal() {
         return total;
     }
@@ -58,6 +65,7 @@ public class PedidoResponse {
     public void setTotal(BigDecimal total) {
         this.total = total;
     }
+
 
     public String getPrioridad() {
         return prioridad;
@@ -67,6 +75,7 @@ public class PedidoResponse {
         this.prioridad = prioridad;
     }
 
+
     public String getEstado() {
         return estado;
     }
@@ -74,6 +83,7 @@ public class PedidoResponse {
     public void setEstado(String estado) {
         this.estado = estado;
     }
+
 
     public LocalDateTime getFecha() {
         return fecha;
@@ -83,6 +93,7 @@ public class PedidoResponse {
         this.fecha = fecha;
     }
 
+
     public String getOrigen() {
         return origen;
     }
@@ -91,12 +102,22 @@ public class PedidoResponse {
         this.origen = origen;
     }
 
+
     public String getNotas() {
         return notas;
     }
 
     public void setNotas(String notas) {
         this.notas = notas;
+    }
+
+
+    public Integer getOrdenRuta() {
+        return ordenRuta;
+    }
+
+    public void setOrdenRuta(Integer ordenRuta) {
+        this.ordenRuta = ordenRuta;
     }
 
 }

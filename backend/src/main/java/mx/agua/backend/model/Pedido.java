@@ -14,9 +14,16 @@ public class Pedido {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Integer id;
 
+
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "cliente_id", nullable = false)
     private Cliente cliente;
+
+
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "envio_id")
+    private Envio envio;
+
 
     @OneToMany(
             mappedBy = "pedido",
@@ -25,30 +32,39 @@ public class Pedido {
     )
     private List<DetallePedido> detalles = new ArrayList<>();
 
+
     @Column(nullable = false, precision = 10, scale = 2)
     private BigDecimal total = BigDecimal.ZERO;
 
+
     @Column(length = 20)
     private String prioridad;
+
 
     @Enumerated(EnumType.STRING)
     @Column(nullable = false, length = 20)
     private PedidoEstado estado;
 
+
     @Column(name = "orden_ruta")
     private Integer ordenRuta;
+
 
     @Column(nullable = false)
     private LocalDateTime fecha;
 
+
     @Column(length = 50)
     private String origen;
+
 
     @Column(columnDefinition = "TEXT")
     private String notas;
 
+
     public Pedido() {
     }
+
 
     @PrePersist
     public void prePersist() {
@@ -67,6 +83,7 @@ public class Pedido {
 
     }
 
+
     public void agregarDetalle(DetallePedido detalle) {
 
         detalle.setPedido(this);
@@ -74,6 +91,7 @@ public class Pedido {
         detalles.add(detalle);
 
     }
+
 
     public void eliminarDetalle(DetallePedido detalle) {
 
@@ -83,81 +101,111 @@ public class Pedido {
 
     }
 
+
     public Integer getId() {
         return id;
     }
+
 
     public void setId(Integer id) {
         this.id = id;
     }
 
+
     public Cliente getCliente() {
         return cliente;
     }
+
 
     public void setCliente(Cliente cliente) {
         this.cliente = cliente;
     }
 
+
+    public Envio getEnvio() {
+        return envio;
+    }
+
+
+    public void setEnvio(Envio envio) {
+        this.envio = envio;
+    }
+
+
     public List<DetallePedido> getDetalles() {
         return detalles;
     }
+
 
     public void setDetalles(List<DetallePedido> detalles) {
         this.detalles = detalles;
     }
 
+
     public BigDecimal getTotal() {
         return total;
     }
+
 
     public void setTotal(BigDecimal total) {
         this.total = total;
     }
 
+
     public String getPrioridad() {
         return prioridad;
     }
+
 
     public void setPrioridad(String prioridad) {
         this.prioridad = prioridad;
     }
 
+
     public PedidoEstado getEstado() {
         return estado;
     }
+
 
     public void setEstado(PedidoEstado estado) {
         this.estado = estado;
     }
 
+
     public Integer getOrdenRuta() {
         return ordenRuta;
     }
+
 
     public void setOrdenRuta(Integer ordenRuta) {
         this.ordenRuta = ordenRuta;
     }
 
+
     public LocalDateTime getFecha() {
         return fecha;
     }
+
 
     public void setFecha(LocalDateTime fecha) {
         this.fecha = fecha;
     }
 
+
     public String getOrigen() {
         return origen;
     }
+
 
     public void setOrigen(String origen) {
         this.origen = origen;
     }
 
+
     public String getNotas() {
         return notas;
     }
+
 
     public void setNotas(String notas) {
         this.notas = notas;
