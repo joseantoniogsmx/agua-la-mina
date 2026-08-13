@@ -1,0 +1,23 @@
+.reparto {
+    padding: 30px;
+}
+
+.reparto h1 {
+    margin-bottom: 20px;
+}
+
+.reparto-map {
+    width: 100%;
+    height: 600px;
+    border-radius: 12px;
+    overflow: hidden;
+    border: 1px solid #ddd;
+}
+
+.reparto-error {
+    padding: 15px;
+    margin-bottom: 15px;
+    border-radius: 8px;
+    background: #fee2e2;
+    color: #991b1b;
+}
