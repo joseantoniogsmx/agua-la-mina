@@ -23,23 +23,31 @@ public class PedidoService {
     private final ProductoRepository productoRepository;
     private final ClienteRepository clienteRepository;
     private final DetallePedidoRepository detallePedidoRepository;
+    private final EnvioService envioService;
+
 
     public PedidoService(
             PedidoRepository pedidoRepository,
             ProductoRepository productoRepository,
             ClienteRepository clienteRepository,
-            DetallePedidoRepository detallePedidoRepository
+            DetallePedidoRepository detallePedidoRepository,
+            EnvioService envioService
     ) {
         this.pedidoRepository = pedidoRepository;
         this.productoRepository = productoRepository;
         this.clienteRepository = clienteRepository;
         this.detallePedidoRepository = detallePedidoRepository;
+        this.envioService = envioService;
     }
+
 
     /**
      * Genera una ruta simple:
      * primero pedidos URGENTES y después NORMALES,
      * ambos ordenados por fecha.
+     *
+     * Este método pertenece al modelo anterior
+     * de generación automática de rutas.
      */
     public List<Pedido> generarRuta() {
 
@@ -73,15 +81,21 @@ public class PedidoService {
         return ruta;
     }
 
+
     /**
-     * (Preparado para el nuevo modelo de pedidos)
+     * Crea un nuevo pedido.
      */
-    public Pedido crearPedido(CrearPedidoRequest request) {
+    public Pedido crearPedido(
+            CrearPedidoRequest request
+    ) {
 
         Cliente cliente = clienteRepository
                 .findById(request.getClienteId())
                 .orElseThrow(() ->
-                        new RuntimeException("Cliente no encontrado"));
+                        new RuntimeException(
+                                "Cliente no encontrado"
+                        )
+                );
 
         Pedido pedido = new Pedido();
 
@@ -89,39 +103,128 @@ public class PedidoService {
         pedido.setPrioridad(request.getPrioridad());
         pedido.setNotas(request.getNotas());
 
-        BigDecimal totalGeneral = BigDecimal.ZERO;
+        BigDecimal totalGeneral =
+                BigDecimal.ZERO;
+
 
         for (var detalleDTO : request.getDetalles()) {
 
-            Producto producto = productoRepository
-                    .findById(detalleDTO.getProductoId())
-                    .orElseThrow(() ->
-                            new RuntimeException("Producto no encontrado"));
+            Producto producto =
+                    productoRepository
+                            .findById(
+                                    detalleDTO.getProductoId()
+                            )
+                            .orElseThrow(() ->
+                                    new RuntimeException(
+                                            "Producto no encontrado"
+                                    )
+                            );
 
-            BigDecimal subtotal = producto.getPrecio()
-                    .multiply(BigDecimal.valueOf(detalleDTO.getCantidad()));
 
-            DetallePedido detalle = new DetallePedido();
+            BigDecimal subtotal =
+                    producto.getPrecio()
+                            .multiply(
+                                    BigDecimal.valueOf(
+                                            detalleDTO.getCantidad()
+                                    )
+                            );
+
+
+            DetallePedido detalle =
+                    new DetallePedido();
 
             detalle.setPedido(pedido);
             detalle.setProducto(producto);
-            detalle.setCantidad(detalleDTO.getCantidad());
-            detalle.setPrestados(detalleDTO.getPrestados());
-            detalle.setPrecioUnitario(producto.getPrecio());
-            detalle.setSubtotal(subtotal);
+            detalle.setCantidad(
+                    detalleDTO.getCantidad()
+            );
+            detalle.setPrestados(
+                    detalleDTO.getPrestados()
+            );
+            detalle.setPrecioUnitario(
+                    producto.getPrecio()
+            );
+            detalle.setSubtotal(
+                    subtotal
+            );
+
 
             pedido.agregarDetalle(detalle);
 
-            totalGeneral = totalGeneral.add(subtotal);
 
+            totalGeneral =
+                    totalGeneral.add(subtotal);
         }
+
 
         pedido.setTotal(totalGeneral);
 
-        Pedido pedidoGuardado = pedidoRepository.save(pedido);
+
+        Pedido pedidoGuardado =
+                pedidoRepository.save(pedido);
+
 
         return pedidoGuardado;
+    }
 
+
+    /**
+     * Marca un pedido en ruta como entregado.
+     *
+     * La transición permitida es:
+     *
+     * EN_RUTA -> ENTREGADO
+     *
+     * Después de entregar el pedido se verifica
+     * si todos los pedidos de su envío también
+     * fueron entregados.
+     */
+    public Pedido marcarComoEntregado(
+            Integer id
+    ) {
+
+        Pedido pedido =
+                pedidoRepository.findById(id)
+                        .orElseThrow(() ->
+                                new RuntimeException(
+                                        "Pedido no encontrado"
+                                )
+                        );
+
+
+        if (
+                pedido.getEstado()
+                        != PedidoEstado.EN_RUTA
+        ) {
+
+            throw new IllegalStateException(
+                    "El pedido no está en ruta y no puede marcarse como entregado."
+            );
+        }
+
+
+        pedido.setEstado(
+                PedidoEstado.ENTREGADO
+        );
+
+
+        Pedido pedidoGuardado =
+                pedidoRepository.save(pedido);
+
+
+        /*
+         * Si el pedido pertenece a un envío,
+         * comprobamos si ese envío ya puede cerrarse.
+         */
+        if (pedido.getEnvio() != null) {
+
+            envioService.verificarCierreEnvio(
+                    pedido.getEnvio().getId()
+            );
+        }
+
+
+        return pedidoGuardado;
     }
 
 }

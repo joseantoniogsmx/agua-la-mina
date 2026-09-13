@@ -8,7 +8,9 @@ import mx.agua.backend.model.DetallePedido;
 import mx.agua.backend.model.Envio;
 import mx.agua.backend.model.EnvioEstado;
 import mx.agua.backend.model.Pedido;
+import mx.agua.backend.model.PedidoEstado;
 import mx.agua.backend.repository.EnvioRepository;
+import mx.agua.backend.repository.PedidoRepository;
 import org.springframework.stereotype.Service;
 
 import java.math.BigDecimal;
@@ -20,12 +22,15 @@ import java.util.List;
 public class EnvioService {
 
     private final EnvioRepository envioRepository;
+    private final PedidoRepository pedidoRepository;
+
 
     public EnvioService(
-            EnvioRepository envioRepository) {
+            EnvioRepository envioRepository,
+            PedidoRepository pedidoRepository) {
 
         this.envioRepository = envioRepository;
-
+        this.pedidoRepository = pedidoRepository;
     }
 
 
@@ -44,7 +49,6 @@ public class EnvioService {
             throw new IllegalArgumentException(
                     "No se puede crear un envío sin pedidos."
             );
-
         }
 
 
@@ -85,7 +89,95 @@ public class EnvioService {
 
 
         return envioRepository.save(envio);
+    }
 
+
+    /**
+     * Verifica si todos los pedidos de un envío
+     * fueron entregados.
+     *
+     * Si todos están ENTREGADO:
+     *
+     * EN_RUTA -> COMPLETADO
+     *
+     * También registra la hora de finalización.
+     */
+    public void verificarCierreEnvio(
+            Integer envioId) {
+
+        if (envioId == null) {
+            return;
+        }
+
+
+        Envio envio =
+                envioRepository
+                        .findById(envioId)
+                        .orElseThrow(() ->
+                                new RuntimeException(
+                                        "Envío no encontrado"
+                                )
+                        );
+
+
+        /*
+         * Solo tiene sentido cerrar un envío
+         * que actualmente está EN_RUTA.
+         */
+        if (
+                envio.getEstado()
+                        != EnvioEstado.EN_RUTA
+        ) {
+            return;
+        }
+
+
+        List<Pedido> pedidos =
+                pedidoRepository.findByEnvioId(
+                        envioId
+                );
+
+
+        /*
+         * Por seguridad, un envío sin pedidos
+         * no se considera completado.
+         */
+        if (
+                pedidos == null ||
+                pedidos.isEmpty()
+        ) {
+            return;
+        }
+
+
+        boolean todosEntregados =
+                pedidos.stream()
+                        .allMatch(
+                                pedido ->
+                                        pedido.getEstado()
+                                                == PedidoEstado.ENTREGADO
+                        );
+
+
+        if (!todosEntregados) {
+            return;
+        }
+
+
+        /*
+         * Todos los pedidos fueron entregados.
+         */
+        envio.setEstado(
+                EnvioEstado.COMPLETADO
+        );
+
+
+        envio.setHoraFin(
+                LocalDateTime.now()
+        );
+
+
+        envioRepository.save(envio);
     }
 
 
@@ -99,14 +191,14 @@ public class EnvioService {
                 .stream()
                 .map(this::convertirEnvio)
                 .toList();
-
     }
 
 
     /**
      * Busca un envío por ID.
      */
-    public EnvioResponse buscarPorId(Integer id) {
+    public EnvioResponse buscarPorId(
+            Integer id) {
 
         Envio envio =
                 envioRepository
@@ -118,7 +210,6 @@ public class EnvioService {
                         );
 
         return convertirEnvio(envio);
-
     }
 
 
@@ -138,7 +229,6 @@ public class EnvioService {
                         );
 
         return convertirEnvio(envio);
-
     }
 
 
@@ -153,7 +243,6 @@ public class EnvioService {
                 .stream()
                 .map(this::convertirEnvio)
                 .toList();
-
     }
 
 
@@ -188,7 +277,6 @@ public class EnvioService {
                 envio.getEstado() != null
                         ? envio.getEstado().name()
                         : null
-
         );
 
 
@@ -218,12 +306,10 @@ public class EnvioService {
                         .stream()
                         .map(this::convertirPedido)
                         .toList()
-
         );
 
 
         return response;
-
     }
 
 
@@ -257,7 +343,6 @@ public class EnvioService {
                 pedido.getEstado() != null
                         ? pedido.getEstado().name()
                         : null
-
         );
 
 
@@ -296,11 +381,8 @@ public class EnvioService {
                             pedido.getCliente().getLatitud(),
 
                             pedido.getCliente().getLongitud()
-
                     )
-
             );
-
         }
 
 
@@ -310,12 +392,10 @@ public class EnvioService {
                         .stream()
                         .map(this::convertirDetalle)
                         .toList()
-
         );
 
 
         return response;
-
     }
 
 
@@ -351,7 +431,6 @@ public class EnvioService {
                     detalle.getProducto()
                             .getCapacidadLitros()
             );
-
         }
 
 
@@ -376,7 +455,6 @@ public class EnvioService {
 
 
         return response;
-
     }
 
 
@@ -406,7 +484,6 @@ public class EnvioService {
                 fecha,
                 consecutivo
         );
-
     }
 
 }

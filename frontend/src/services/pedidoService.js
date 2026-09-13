@@ -18,6 +18,7 @@ export async function obtenerPedidos() {
 
 }
 
+
 export async function obtenerPedido(id) {
 
     return await get(`/pedidos/${id}`);
@@ -44,9 +45,42 @@ export async function crearPedido(datos) {
  * ==========================================================
  */
 
-export async function actualizarPedido(id, datos) {
+export async function actualizarPedido(
+    id,
+    datos
+) {
 
-    return await put(`/pedidos/${id}`, datos);
+    return await put(
+        `/pedidos/${id}`,
+        datos
+    );
+
+}
+
+
+/*
+ * ==========================================================
+ * ENTREGA
+ * ==========================================================
+ */
+
+/**
+ * Marca un pedido EN_RUTA como ENTREGADO.
+ *
+ * El backend se encarga de:
+ *
+ * EN_RUTA -> ENTREGADO
+ *
+ * y de comprobar si el envío puede pasar
+ * a COMPLETADO.
+ */
+export async function marcarPedidoComoEntregado(
+    id
+) {
+
+    return await put(
+        `/pedidos/${id}/entregado`
+    );
 
 }
 
@@ -59,6 +93,8 @@ export async function actualizarPedido(id, datos) {
 
 export async function eliminarPedido(id) {
 
-    return await del(`/pedidos/${id}`);
+    return await del(
+        `/pedidos/${id}`
+    );
 
 }

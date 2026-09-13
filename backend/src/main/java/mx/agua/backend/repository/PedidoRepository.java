@@ -12,14 +12,27 @@ public interface PedidoRepository extends JpaRepository<Pedido, Integer> {
 
     List<Pedido> findByEstado(PedidoEstado estado);
 
-    List<Pedido> findByEstadoOrderByFechaAsc(PedidoEstado estado);
+
+    List<Pedido> findByEstadoOrderByFechaAsc(
+            PedidoEstado estado
+    );
+
 
     List<Pedido> findByEstadoAndPrioridadOrderByFechaAsc(
             PedidoEstado estado,
             String prioridad
     );
 
-    long countByEstado(PedidoEstado estado);
+
+    List<Pedido> findByEnvioId(
+            Integer envioId
+    );
+
+
+    long countByEstado(
+            PedidoEstado estado
+    );
+
 
     @Query("""
             SELECT COALESCE(SUM(p.total), 0)

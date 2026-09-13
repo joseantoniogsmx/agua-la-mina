@@ -21,6 +21,11 @@ export async function loadMapsLibrary() {
     return await importLibrary("maps");
 }
 
+export async function loadCoreLibrary() {
+    initialize();
+    return await importLibrary("core");
+}
+
 export async function loadMarkerLibrary() {
     initialize();
     return await importLibrary("marker");
@@ -34,4 +39,9 @@ export async function loadPlacesLibrary() {
 export async function loadGeocodingLibrary() {
     initialize();
     return await importLibrary("geocoding");
+}
+
+export async function loadRoutesLibrary() {
+    initialize();
+    return await importLibrary("routes");
 }

@@ -8,6 +8,7 @@ import mx.agua.backend.model.DetallePedido;
 import mx.agua.backend.model.Pedido;
 import mx.agua.backend.model.PedidoEstado;
 import mx.agua.backend.repository.PedidoRepository;
+import mx.agua.backend.service.PedidoService;
 import mx.agua.backend.service.PedidoV2Service;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -21,17 +22,21 @@ public class PedidoController {
 
     private final PedidoRepository pedidoRepository;
 
+    private final PedidoService pedidoService;
+
     private final PedidoV2Service pedidoV2Service;
 
 
     public PedidoController(
             PedidoRepository pedidoRepository,
+            PedidoService pedidoService,
             PedidoV2Service pedidoV2Service) {
 
         this.pedidoRepository = pedidoRepository;
 
-        this.pedidoV2Service = pedidoV2Service;
+        this.pedidoService = pedidoService;
 
+        this.pedidoV2Service = pedidoV2Service;
     }
 
 
@@ -45,7 +50,6 @@ public class PedidoController {
                 .map(this::convertirPedido)
 
                 .toList();
-
     }
 
 
@@ -60,7 +64,6 @@ public class PedidoController {
                 .map(this::convertirPedido)
 
                 .toList();
-
     }
 
 
@@ -72,32 +75,37 @@ public class PedidoController {
                 pedidoV2Service.crearPedido(request);
 
         return ResponseEntity.ok(pedido);
-
     }
 
 
+    /**
+     * Marca un pedido EN_RUTA como ENTREGADO.
+     *
+     * Transición permitida:
+     *
+     * EN_RUTA -> ENTREGADO
+     */
     @PutMapping("/{id}/entregado")
-    public ResponseEntity<Pedido> entregarPedido(
+    public ResponseEntity<?> entregarPedido(
             @PathVariable Integer id) {
 
-        return pedidoRepository.findById(id)
+        try {
 
-                .map(pedido -> {
+            Pedido pedido =
+                    pedidoService.marcarComoEntregado(id);
 
-                    pedido.setEstado(
-                            PedidoEstado.ENTREGADO
+            return ResponseEntity.ok(
+                    convertirPedido(pedido)
+            );
+
+        } catch (RuntimeException e) {
+
+            return ResponseEntity
+                    .badRequest()
+                    .body(
+                            e.getMessage()
                     );
-
-                    pedidoRepository.save(pedido);
-
-                    return ResponseEntity.ok(pedido);
-
-                })
-
-                .orElse(
-                        ResponseEntity.notFound().build()
-                );
-
+        }
     }
 
 
@@ -130,7 +138,6 @@ public class PedidoController {
                         ? pedido.getEstado().name()
 
                         : null
-
         );
 
 
@@ -164,11 +171,8 @@ public class PedidoController {
                             pedido.getCliente().getLatitud(),
 
                             pedido.getCliente().getLongitud()
-
                     )
-
             );
-
         }
 
 
@@ -181,12 +185,15 @@ public class PedidoController {
                         .map(this::convertirDetalle)
 
                         .toList()
+        );
 
+
+        response.setOrdenRuta(
+                pedido.getOrdenRuta()
         );
 
 
         return response;
-
     }
 
 
@@ -218,7 +225,6 @@ public class PedidoController {
                     detalle.getProducto()
                             .getCapacidadLitros()
             );
-
         }
 
 
@@ -243,7 +249,6 @@ public class PedidoController {
 
 
         return response;
-
     }
 
 }
