@@ -26,6 +26,8 @@ public class PedidoResponse {
 
     private Integer ordenRuta;
 
+    private Integer envioId;
+
 
     public PedidoResponse() {
     }
@@ -118,6 +120,15 @@ public class PedidoResponse {
 
     public void setOrdenRuta(Integer ordenRuta) {
         this.ordenRuta = ordenRuta;
+    }
+
+
+    public Integer getEnvioId() {
+        return envioId;
+    }
+
+    public void setEnvioId(Integer envioId) {
+        this.envioId = envioId;
     }
 
 }

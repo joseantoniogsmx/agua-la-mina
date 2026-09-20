@@ -1,6 +1,10 @@
 import { useEffect, useRef, useState } from "react";
 
 import {
+    useLocation
+} from "react-router-dom";
+
+import {
     loadMapsLibrary,
     loadCoreLibrary,
     loadMarkerLibrary,
@@ -105,6 +109,8 @@ function formatearDireccion(cliente) {
 
 export default function Reparto() {
 
+    const location = useLocation();
+
     const mapaRef = useRef(null);
     const mapaInstanceRef = useRef(null);
 
@@ -167,6 +173,7 @@ export default function Reparto() {
             } finally {
 
                 setCargando(false);
+
             }
         }
 
@@ -259,7 +266,15 @@ export default function Reparto() {
 
     /*
      * ==========================================================
-     * SELECCIONAR PRIMER ENVÍO
+     * SELECCIONAR ENVÍO
+     * ==========================================================
+     *
+     * Si venimos desde Pedidos con un envioId,
+     * se selecciona automáticamente ese envío.
+     *
+     * Si no venimos desde Pedidos, se conserva
+     * el comportamiento anterior y se selecciona
+     * el primer envío disponible.
      * ==========================================================
      */
 
@@ -272,11 +287,36 @@ export default function Reparto() {
             return;
         }
 
+        const envioIdNavegacion =
+            location.state?.envioId;
+
+        if (envioIdNavegacion) {
+
+            const envioEncontrado =
+                envios.find(
+                    (envio) =>
+                        Number(envio.id) ===
+                        Number(envioIdNavegacion)
+                );
+
+            if (envioEncontrado) {
+
+                seleccionarEnvio(
+                    envioEncontrado
+                );
+
+                return;
+            }
+        }
+
         seleccionarEnvio(
             envios[0]
         );
 
-    }, [envios]);
+    }, [
+        envios,
+        location.state?.envioId
+    ]);
 
 
     /*
@@ -292,7 +332,10 @@ export default function Reparto() {
         try {
 
             setError("");
-            setEnvioSeleccionado(envio);
+
+            setEnvioSeleccionado(
+                envio
+            );
 
             let envioCompleto = envio;
 
@@ -369,6 +412,7 @@ export default function Reparto() {
              * para obtener los estados reales
              * del backend.
              */
+
             const envioActualizado =
                 await obtenerEnvio(
                     envioSeleccionado.id
@@ -386,6 +430,7 @@ export default function Reparto() {
              * Si el envío ya fue completado,
              * deja de pertenecer a EN_RUTA.
              */
+
             if (
                 envioActualizado.estado ===
                 "COMPLETADO"
@@ -420,6 +465,7 @@ export default function Reparto() {
              * para conservar los marcadores
              * y la ruta.
              */
+
             if (
                 envioActualizado.estado ===
                 "EN_RUTA"
@@ -463,6 +509,7 @@ export default function Reparto() {
             marker => {
 
                 marker.map = null;
+
             }
         );
 
@@ -482,6 +529,7 @@ export default function Reparto() {
             polyline => {
 
                 polyline.setMap(null);
+
             }
         );
 
@@ -518,6 +566,7 @@ export default function Reparto() {
         /*
          * Purificadora.
          */
+
         const pinOrigen =
             new PinElement({
                 glyphText: "A"
@@ -546,6 +595,7 @@ export default function Reparto() {
         /*
          * Clientes.
          */
+
         pedidos.forEach(
             (pedido, indice) => {
 
@@ -959,6 +1009,7 @@ export default function Reparto() {
      */
 
     return (
+
         <div className="reparto-page">
 
             <div className="reparto-header">
@@ -1065,10 +1116,12 @@ export default function Reparto() {
                                         </span>
 
                                     </button>
+
                                 )
                             )}
 
                         </div>
+
                     )}
 
                 </aside>

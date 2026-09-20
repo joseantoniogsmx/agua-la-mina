@@ -1,4 +1,5 @@
 import { useEffect, useState } from "react";
+import { useNavigate } from "react-router-dom";
 
 import {
     obtenerPedidos,
@@ -13,16 +14,33 @@ import PedidoTable from "../../components/pedidos/PedidoTable/PedidoTable";
 
 import "./Pedidos.css";
 
+
 export default function Pedidos() {
 
-    const [pedidos, setPedidos] = useState([]);
+    const navigate = useNavigate();
 
-    const [productos, setProductos] = useState([]);
 
-    const [clientes, setClientes] = useState([]);
+    const [pedidos, setPedidos] =
+        useState([]);
 
-    const [cargando, setCargando] = useState(true);
+    const [productos, setProductos] =
+        useState([]);
 
+    const [clientes, setClientes] =
+        useState([]);
+
+    const [cargando, setCargando] =
+        useState(true);
+
+    const [pedidoEditando, setPedidoEditando] =
+        useState(null);
+
+
+    /*
+     * ==========================================================
+     * CARGAR INFORMACIÓN
+     * ==========================================================
+     */
 
     useEffect(() => {
 
@@ -38,13 +56,9 @@ export default function Pedidos() {
             setCargando(true);
 
             const [
-
                 listaPedidos,
-
                 listaProductos,
-
                 listaClientes
-
             ] = await Promise.all([
 
                 obtenerPedidos(),
@@ -55,20 +69,28 @@ export default function Pedidos() {
 
             ]);
 
-            setPedidos(listaPedidos);
 
-            setProductos(listaProductos);
+            setPedidos(
+                listaPedidos
+            );
 
-            setClientes(listaClientes);
+            setProductos(
+                listaProductos
+            );
+
+            setClientes(
+                listaClientes
+            );
 
         } catch (error) {
 
-            console.error(error);
+            console.error(
+                "Error al cargar información:",
+                error
+            );
 
             alert(
-
                 "No fue posible cargar la información."
-
             );
 
         } finally {
@@ -80,23 +102,32 @@ export default function Pedidos() {
     }
 
 
+    /*
+     * ==========================================================
+     * GUARDAR NUEVO PEDIDO
+     * ==========================================================
+     */
+
     async function guardarPedido(request) {
 
         try {
 
-            await crearPedido(request);
+            await crearPedido(
+                request
+            );
 
             alert(
-
                 "Pedido registrado correctamente."
-
             );
 
             await cargarInformacion();
 
         } catch (error) {
 
-            console.error(error);
+            console.error(
+                "Error al guardar el pedido:",
+                error
+            );
 
             alert(
 
@@ -104,7 +135,7 @@ export default function Pedidos() {
 
                 error?.response?.data ||
 
-                error.message ||
+                error?.message ||
 
                 "No fue posible guardar el pedido."
 
@@ -117,20 +148,110 @@ export default function Pedidos() {
     }
 
 
+    /*
+     * ==========================================================
+     * INICIAR EDICIÓN
+     * ==========================================================
+     */
+
+    function iniciarEdicion(pedido) {
+
+        if (
+            !pedido ||
+            pedido.estado !== "PENDIENTE"
+        ) {
+
+            return;
+
+        }
+
+        setPedidoEditando(
+            pedido
+        );
+
+
+        window.scrollTo({
+
+            top: 0,
+
+            behavior: "smooth"
+
+        });
+
+    }
+
+
+    /*
+     * ==========================================================
+     * CANCELAR EDICIÓN
+     * ==========================================================
+     */
+
+    function cancelarEdicion() {
+
+        setPedidoEditando(
+            null
+        );
+
+    }
+
+
+    /*
+     * ==========================================================
+     * VER RUTA DEL PEDIDO
+     * ==========================================================
+     */
+
+    function verRuta(pedido) {
+
+        if (
+            !pedido ||
+            pedido.estado !== "EN_RUTA"
+        ) {
+
+            return;
+
+        }
+
+
+        if (!pedido.envioId) {
+
+            alert(
+                "Este pedido está en ruta, pero no tiene un envío asociado."
+            );
+
+            return;
+
+        }
+
+
+        navigate(
+            "/reparto",
+            {
+                state: {
+                    envioId: pedido.envioId
+                }
+            }
+        );
+
+    }
+
+
     return (
 
         <div className="pedidos-page">
+
 
             <div className="pedidos-header">
 
                 <div>
 
-                    <h1>Pedidos</h1>
+                    <h1>
+                        Pedidos
+                    </h1>
 
                     <p>
-
                         Administración de pedidos
-
                     </p>
 
                 </div>
@@ -140,11 +261,25 @@ export default function Pedidos() {
 
             <PedidoForm
 
-                clientes={clientes}
+                clientes={
+                    clientes
+                }
 
-                productos={productos}
+                productos={
+                    productos
+                }
 
-                onGuardar={guardarPedido}
+                onGuardar={
+                    guardarPedido
+                }
+
+                pedidoEditando={
+                    pedidoEditando
+                }
+
+                onCancelarEdicion={
+                    cancelarEdicion
+                }
 
             />
 
@@ -152,33 +287,44 @@ export default function Pedidos() {
             <section className="pedidos-lista">
 
                 <h2>
-
                     Pedidos registrados
-
                 </h2>
 
-                {
 
+                {
                     cargando
 
-                        ?
+                        ? (
 
-                        <p>
+                            <p>
+                                Cargando pedidos...
+                            </p>
 
-                            Cargando pedidos...
+                        )
 
-                        </p>
+                        : (
 
-                        :
+                            <PedidoTable
 
-                        <PedidoTable
+                                pedidos={
+                                    pedidos
+                                }
 
-                            pedidos={pedidos}
+                                onActualizar={
+                                    cargarInformacion
+                                }
 
-                            onActualizar={cargarInformacion}
+                                onEditar={
+                                    iniciarEdicion
+                                }
 
-                        />
+                                onVerRuta={
+                                    verRuta
+                                }
 
+                            />
+
+                        )
                 }
 
             </section>

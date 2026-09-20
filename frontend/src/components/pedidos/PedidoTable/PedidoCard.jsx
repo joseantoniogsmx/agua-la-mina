@@ -1,31 +1,50 @@
 import "./PedidoCard.css";
 
 export default function PedidoCard({
-
     pedido,
-
     expandido,
-
     onExpandir,
-
-    onEliminar
-
+    onEditar,
+    onEliminar,
+    onVerRuta
 }) {
 
-    const detalles = pedido.detalles || [];
+    const detalles =
+        pedido.detalles || [];
 
 
-    const resumenProductos = detalles.length === 0
+    /*
+     * ==========================================================
+     * ESTADO DEL PEDIDO
+     * ==========================================================
+     */
 
-        ? "Sin productos"
+    const esPendiente =
+        pedido.estado === "PENDIENTE";
 
-        : detalles
+    const esEnRuta =
+        pedido.estado === "EN_RUTA";
 
-            .slice(0, 2)
 
-            .map((detalle) => detalle.marca)
+    /*
+     * ==========================================================
+     * RESUMEN DE PRODUCTOS
+     * ==========================================================
+     */
 
-            .join(" • ");
+    const resumenProductos =
+
+        detalles.length === 0
+
+            ? "Sin productos"
+
+            : detalles
+                .slice(0, 2)
+                .map(
+                    (detalle) =>
+                        detalle.marca
+                )
+                .join(" • ");
 
 
     const productosRestantes =
@@ -37,7 +56,15 @@ export default function PedidoCard({
             : 0;
 
 
-    function obtenerClaseEstado(estado) {
+    /*
+     * ==========================================================
+     * CLASE DEL ESTADO
+     * ==========================================================
+     */
+
+    function obtenerClaseEstado(
+        estado
+    ) {
 
         if (!estado) {
 
@@ -50,7 +77,15 @@ export default function PedidoCard({
     }
 
 
-    function formatearFecha(fecha) {
+    /*
+     * ==========================================================
+     * FORMATEAR FECHA
+     * ==========================================================
+     */
+
+    function formatearFecha(
+        fecha
+    ) {
 
         if (!fecha) {
 
@@ -58,26 +93,60 @@ export default function PedidoCard({
 
         }
 
-        const fechaConvertida = new Date(fecha);
+        const fechaConvertida =
+            new Date(fecha);
+
 
         if (
-
             Number.isNaN(
-
                 fechaConvertida.getTime()
-
             )
-
         ) {
 
             return "-";
 
         }
 
+
         return fechaConvertida.toLocaleString();
 
     }
 
+
+    /*
+     * ==========================================================
+     * ABRIR RUTA
+     * ==========================================================
+     */
+
+    function manejarVerRuta() {
+
+        if (!pedido.envioId) {
+
+            alert(
+                "Este pedido está en ruta, pero no tiene un envío asociado."
+            );
+
+            return;
+
+        }
+
+        if (onVerRuta) {
+
+            onVerRuta(
+                pedido
+            );
+
+        }
+
+    }
+
+
+    /*
+     * ==========================================================
+     * RENDER
+     * ==========================================================
+     */
 
     return (
 
@@ -97,39 +166,39 @@ export default function PedidoCard({
 
             <div className="pedido-card-principal">
 
+
+                {/* ==================================================
+                    FOLIO
+                ================================================== */}
+
                 <div className="pedido-info folio">
 
                     <span>
-
                         Folio
-
                     </span>
 
                     <strong>
-
                         #{pedido.id}
-
                     </strong>
 
                 </div>
 
+
+                {/* ==================================================
+                    CLIENTE
+                ================================================== */}
 
                 <div className="pedido-info cliente">
 
                     <span>
-
                         Cliente
-
                     </span>
 
                     <strong>
 
                         {
-
                             pedido.cliente?.nombre ??
-
                             "Sin cliente"
-
                         }
 
                     </strong>
@@ -137,24 +206,22 @@ export default function PedidoCard({
                 </div>
 
 
+                {/* ==================================================
+                    PRODUCTOS
+                ================================================== */}
+
                 <div className="pedido-info productos">
 
                     <span>
-
                         Productos
-
                     </span>
 
                     <strong>
 
-                        {
+                        {resumenProductos}
 
-                            resumenProductos
-
-                        }
 
                         {
-
                             productosRestantes > 0 && (
 
                                 <>
@@ -162,23 +229,12 @@ export default function PedidoCard({
                                     <br />
 
                                     <small>
-
-                                        +
-
-                                        {
-
-                                            productosRestantes
-
-                                        }
-
-                                        {" más"}
-
+                                        +{productosRestantes} más
                                     </small>
 
                                 </>
 
                             )
-
                         }
 
                     </strong>
@@ -186,26 +242,23 @@ export default function PedidoCard({
                 </div>
 
 
+                {/* ==================================================
+                    TOTAL
+                ================================================== */}
+
                 <div className="pedido-info total">
 
                     <span>
-
                         Total
-
                     </span>
 
                     <strong>
 
                         $
-
                         {
-
                             Number(
-
                                 pedido.total
-
                             ).toFixed(2)
-
                         }
 
                     </strong>
@@ -213,49 +266,53 @@ export default function PedidoCard({
                 </div>
 
 
+                {/* ==================================================
+                    ESTADO
+                ================================================== */}
+
                 <div className="pedido-info estado-container">
 
                     <span>
-
                         Estado
-
                     </span>
 
                     <strong
 
-                        className={`estado ${obtenerClaseEstado(
-
-                            pedido.estado
-
-                        )}`}
+                        className={
+                            `estado ${
+                                obtenerClaseEstado(
+                                    pedido.estado
+                                )
+                            }`
+                        }
 
                     >
 
-                        {pedido.estado}
+                        {
+                            pedido.estado
+                        }
 
                     </strong>
 
                 </div>
 
 
+                {/* ==================================================
+                    FECHA
+                ================================================== */}
+
                 <div className="pedido-info fecha">
 
                     <span>
-
                         Fecha
-
                     </span>
 
                     <strong>
 
                         {
-
                             formatearFecha(
-
                                 pedido.fecha
-
                             )
-
                         }
 
                     </strong>
@@ -263,7 +320,14 @@ export default function PedidoCard({
                 </div>
 
 
+                {/* ==================================================
+                    ACCIONES
+                ================================================== */}
+
                 <div className="pedido-acciones">
+
+
+                    {/* VER DETALLE */}
 
                     <button
 
@@ -272,62 +336,134 @@ export default function PedidoCard({
                         className="btn-expandir"
 
                         onClick={() =>
-
                             onExpandir(
-
                                 pedido.id
-
                             )
-
                         }
 
                         title={
-
                             expandido
-
                                 ? "Ocultar detalles"
-
                                 : "Ver detalles"
-
                         }
 
                     >
 
-                        {expandido ? "▲" : "▼"}
-
-                    </button>
-
-
-                    <button
-
-                        type="button"
-
-                        className="btn-eliminar-pedido"
-
-                        onClick={() =>
-
-                            onEliminar(pedido)
-
+                        {
+                            expandido
+                                ? "▲"
+                                : "▼"
                         }
 
-                        title="Eliminar pedido"
-
-                    >
-
-                        🗑
-
                     </button>
+
+
+                    {/* ==================================================
+                        EDITAR
+                    ================================================== */}
+
+                    {
+                        esPendiente &&
+                        onEditar && (
+
+                            <button
+
+                                type="button"
+
+                                className="btn-editar-pedido"
+
+                                onClick={() =>
+                                    onEditar(
+                                        pedido
+                                    )
+                                }
+
+                                title="Editar pedido"
+
+                            >
+
+                                ✏️
+
+                            </button>
+
+                        )
+                    }
+
+
+                    {/* ==================================================
+                        ELIMINAR
+                    ================================================== */}
+
+                    {
+                        esPendiente &&
+                        onEliminar && (
+
+                            <button
+
+                                type="button"
+
+                                className="btn-eliminar-pedido"
+
+                                onClick={() =>
+                                    onEliminar(
+                                        pedido
+                                    )
+                                }
+
+                                title="Eliminar pedido"
+
+                            >
+
+                                🗑️
+
+                            </button>
+
+                        )
+                    }
+
+
+                    {/* ==================================================
+                        VER RUTA
+                    ================================================== */}
+
+                    {
+                        esEnRuta && (
+
+                            <button
+
+                                type="button"
+
+                                className="btn-ruta-pedido"
+
+                                onClick={
+                                    manejarVerRuta
+                                }
+
+                                title="Ver ruta de reparto"
+
+                            >
+
+                                🚚
+
+                            </button>
+
+                        )
+                    }
 
                 </div>
 
             </div>
 
 
-            {
+            {/* ==================================================
+                DETALLE EXPANDIDO
+            ================================================== */}
 
+            {
                 expandido && (
 
                     <div className="pedido-detalle">
+
 
                         <div className="pedido-detalle-titulo">
 
@@ -337,12 +473,9 @@ export default function PedidoCard({
 
 
                         {
-
                             detalles.length === 0
 
-                                ?
-
-                                (
+                                ? (
 
                                     <p className="sin-detalles">
 
@@ -352,32 +485,22 @@ export default function PedidoCard({
 
                                 )
 
-                                :
-
-                                (
+                                : (
 
                                     <div className="detalles-lista">
 
                                         {
-
                                             detalles.map(
-
                                                 (
-
                                                     detalle,
-
                                                     index
-
                                                 ) => (
 
                                                     <div
 
                                                         key={
-
                                                             detalle.id ??
-
                                                             index
-
                                                         }
 
                                                         className="detalle-producto"
@@ -389,33 +512,25 @@ export default function PedidoCard({
                                                             <strong>
 
                                                                 {
-
                                                                     detalle.marca ??
-
                                                                     "Producto"
-
                                                                 }
 
                                                             </strong>
 
                                                             {
-
                                                                 detalle.capacidadLitros && (
 
                                                                     <span>
 
                                                                         {
-
                                                                             detalle.capacidadLitros
-
-                                                                        }
-
-                                                                        {" L"}
+                                                                        }{" "}
+                                                                        L
 
                                                                     </span>
 
                                                                 )
-
                                                             }
 
                                                         </div>
@@ -424,19 +539,14 @@ export default function PedidoCard({
                                                         <div className="detalle-dato">
 
                                                             <span>
-
                                                                 Cantidad
-
                                                             </span>
 
                                                             <strong>
 
                                                                 {
-
                                                                     detalle.cantidad ??
-
                                                                     0
-
                                                                 }
 
                                                             </strong>
@@ -447,19 +557,14 @@ export default function PedidoCard({
                                                         <div className="detalle-dato">
 
                                                             <span>
-
                                                                 Prestados
-
                                                             </span>
 
                                                             <strong>
 
                                                                 {
-
                                                                     detalle.prestados ??
-
                                                                     0
-
                                                                 }
 
                                                             </strong>
@@ -470,9 +575,7 @@ export default function PedidoCard({
                                                         <div className="detalle-dato">
 
                                                             <span>
-
                                                                 Precio
-
                                                             </span>
 
                                                             <strong>
@@ -480,15 +583,10 @@ export default function PedidoCard({
                                                                 $
 
                                                                 {
-
                                                                     Number(
-
                                                                         detalle.precioUnitario ??
-
                                                                         0
-
                                                                     ).toFixed(2)
-
                                                                 }
 
                                                             </strong>
@@ -499,9 +597,7 @@ export default function PedidoCard({
                                                         <div className="detalle-dato subtotal">
 
                                                             <span>
-
                                                                 Subtotal
-
                                                             </span>
 
                                                             <strong>
@@ -509,15 +605,10 @@ export default function PedidoCard({
                                                                 $
 
                                                                 {
-
                                                                     Number(
-
                                                                         detalle.subtotal ??
-
                                                                         0
-
                                                                     ).toFixed(2)
-
                                                                 }
 
                                                             </strong>
@@ -527,38 +618,28 @@ export default function PedidoCard({
                                                     </div>
 
                                                 )
-
                                             )
-
                                         }
 
                                     </div>
 
                                 )
-
                         }
 
 
                         <div className="detalle-total">
 
                             <span>
-
                                 Total del pedido
-
                             </span>
 
                             <strong>
 
                                 $
-
                                 {
-
                                     Number(
-
                                         pedido.total
-
                                     ).toFixed(2)
-
                                 }
 
                             </strong>
@@ -567,33 +648,28 @@ export default function PedidoCard({
 
 
                         {
-
                             pedido.notas && (
 
                                 <div className="detalle-notas">
 
                                     <strong>
-
                                         Observaciones
-
                                     </strong>
 
                                     <p>
-
-                                        {pedido.notas}
-
+                                        {
+                                            pedido.notas
+                                        }
                                     </p>
 
                                 </div>
 
                             )
-
                         }
 
                     </div>
 
                 )
-
             }
 
         </article>

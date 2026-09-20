@@ -21,11 +21,8 @@ import java.util.List;
 public class PedidoController {
 
     private final PedidoRepository pedidoRepository;
-
     private final PedidoService pedidoService;
-
     private final PedidoV2Service pedidoV2Service;
-
 
     public PedidoController(
             PedidoRepository pedidoRepository,
@@ -33,9 +30,7 @@ public class PedidoController {
             PedidoV2Service pedidoV2Service) {
 
         this.pedidoRepository = pedidoRepository;
-
         this.pedidoService = pedidoService;
-
         this.pedidoV2Service = pedidoV2Service;
     }
 
@@ -43,12 +38,10 @@ public class PedidoController {
     @GetMapping
     public List<PedidoResponse> listarPedidos() {
 
-        return pedidoRepository.findAll()
-
+        return pedidoRepository
+                .findAll()
                 .stream()
-
                 .map(this::convertirPedido)
-
                 .toList();
     }
 
@@ -58,33 +51,82 @@ public class PedidoController {
 
         return pedidoRepository
                 .findByEstado(PedidoEstado.PENDIENTE)
-
                 .stream()
-
                 .map(this::convertirPedido)
-
                 .toList();
     }
 
 
-    @PostMapping
-    public ResponseEntity<Pedido> crearPedido(
-            @RequestBody CrearPedidoRequest request) {
+    @GetMapping("/{id}")
+    public ResponseEntity<?> obtenerPedido(
+            @PathVariable Integer id) {
 
-        Pedido pedido =
-                pedidoV2Service.crearPedido(request);
+        try {
 
-        return ResponseEntity.ok(pedido);
+            Pedido pedido =
+                    pedidoV2Service.obtenerPedido(id);
+
+            return ResponseEntity.ok(
+                    convertirPedido(pedido)
+            );
+
+        } catch (RuntimeException e) {
+
+            return ResponseEntity
+                    .notFound()
+                    .build();
+        }
     }
 
 
-    /**
-     * Marca un pedido EN_RUTA como ENTREGADO.
-     *
-     * Transición permitida:
-     *
-     * EN_RUTA -> ENTREGADO
-     */
+    @PostMapping
+    public ResponseEntity<?> crearPedido(
+            @RequestBody CrearPedidoRequest request) {
+
+        try {
+
+            Pedido pedido =
+                    pedidoV2Service.crearPedido(request);
+
+            return ResponseEntity.ok(
+                    convertirPedido(pedido)
+            );
+
+        } catch (RuntimeException e) {
+
+            return ResponseEntity
+                    .badRequest()
+                    .body(e.getMessage());
+        }
+    }
+
+
+    @PutMapping("/{id}")
+    public ResponseEntity<?> actualizarPedido(
+            @PathVariable Integer id,
+            @RequestBody CrearPedidoRequest request) {
+
+        try {
+
+            Pedido pedido =
+                    pedidoV2Service.actualizarPedido(
+                            id,
+                            request
+                    );
+
+            return ResponseEntity.ok(
+                    convertirPedido(pedido)
+            );
+
+        } catch (RuntimeException e) {
+
+            return ResponseEntity
+                    .badRequest()
+                    .body(e.getMessage());
+        }
+    }
+
+
     @PutMapping("/{id}/entregado")
     public ResponseEntity<?> entregarPedido(
             @PathVariable Integer id) {
@@ -102,9 +144,28 @@ public class PedidoController {
 
             return ResponseEntity
                     .badRequest()
-                    .body(
-                            e.getMessage()
-                    );
+                    .body(e.getMessage());
+        }
+    }
+
+
+    @DeleteMapping("/{id}")
+    public ResponseEntity<?> eliminarPedido(
+            @PathVariable Integer id) {
+
+        try {
+
+            pedidoV2Service.eliminarPedido(id);
+
+            return ResponseEntity
+                    .noContent()
+                    .build();
+
+        } catch (RuntimeException e) {
+
+            return ResponseEntity
+                    .badRequest()
+                    .body(e.getMessage());
         }
     }
 
@@ -138,6 +199,7 @@ public class PedidoController {
                         ? pedido.getEstado().name()
 
                         : null
+
         );
 
 
@@ -156,6 +218,44 @@ public class PedidoController {
         );
 
 
+        response.setOrdenRuta(
+                pedido.getOrdenRuta()
+        );
+
+
+        /*
+         * ======================================================
+         * ENVÍO / RUTA
+         * ======================================================
+         *
+         * Si el pedido pertenece a un envío,
+         * enviamos su identificador al frontend.
+         *
+         * Esto permitirá acceder directamente
+         * a la ruta desde el pedido.
+         */
+
+        if (pedido.getEnvio() != null) {
+
+            response.setEnvioId(
+                    pedido.getEnvio().getId()
+            );
+
+        } else {
+
+            response.setEnvioId(
+                    null
+            );
+
+        }
+
+
+        /*
+         * ======================================================
+         * CLIENTE
+         * ======================================================
+         */
+
         if (pedido.getCliente() != null) {
 
             response.setCliente(
@@ -171,10 +271,19 @@ public class PedidoController {
                             pedido.getCliente().getLatitud(),
 
                             pedido.getCliente().getLongitud()
+
                     )
+
             );
+
         }
 
+
+        /*
+         * ======================================================
+         * DETALLES
+         * ======================================================
+         */
 
         response.setDetalles(
 
@@ -182,14 +291,12 @@ public class PedidoController {
 
                         .stream()
 
-                        .map(this::convertirDetalle)
+                        .map(
+                                this::convertirDetalle
+                        )
 
                         .toList()
-        );
 
-
-        response.setOrdenRuta(
-                pedido.getOrdenRuta()
         );
 
 
@@ -225,6 +332,7 @@ public class PedidoController {
                     detalle.getProducto()
                             .getCapacidadLitros()
             );
+
         }
 
 

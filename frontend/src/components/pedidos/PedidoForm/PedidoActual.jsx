@@ -10,7 +10,11 @@ export default function PedidoActual({
 
     onVaciarPedido,
 
-    onGuardarPedido
+    onGuardarPedido,
+
+    modoEdicion = false,
+
+    guardando = false
 
 }) {
 
@@ -20,230 +24,238 @@ export default function PedidoActual({
 
             <div className="pedido-header">
 
-                <h2>🛒 Pedido actual</h2>
+                <h2>
+                    🛒 Pedido actual
+                </h2>
 
                 {
+                    pedidoActual.length > 0 && (
 
-                    pedidoActual.length > 0 &&
+                        <span className="pedido-badge">
 
-                    <span className="pedido-badge">
+                            {pedidoActual.length}
 
-                        {pedidoActual.length}
+                            {
+                                pedidoActual.length === 1
+                                    ? " producto"
+                                    : " productos"
+                            }
 
-                        {
+                        </span>
 
-                            pedidoActual.length === 1
-
-                                ? " producto"
-
-                                : " productos"
-
-                        }
-
-                    </span>
-
+                    )
                 }
 
             </div>
 
-            {
 
+            {
                 pedidoActual.length === 0
 
                     ?
 
-                    <div className="pedido-vacio">
+                    (
 
-                        <div className="pedido-vacio-icono">
+                        <div className="pedido-vacio">
 
-                            📦
+                            <div className="pedido-vacio-icono">
+                                📦
+                            </div>
+
+                            <h3>
+                                Aún no hay productos
+                            </h3>
+
+                            <p>
+                                Selecciona un producto para comenzar el pedido.
+                            </p>
 
                         </div>
 
-                        <h3>
-
-                            Aún no hay productos
-
-                        </h3>
-
-                        <p>
-
-                            Selecciona un producto para comenzar el pedido.
-
-                        </p>
-
-                    </div>
+                    )
 
                     :
 
-                    <>
+                    (
 
-                        <div className="pedido-lista">
+                        <>
 
-                            {
+                            <div className="pedido-lista">
 
-                                pedidoActual.map((item, index) => (
+                                {
+                                    pedidoActual.map(
+                                        (item, index) => (
 
-                                    <div
-
-                                        key={index}
-
-                                        className="pedido-card"
-
-                                    >
-
-                                        <div className="pedido-info">
-
-                                            <div>
-
-                                                <h4>
-
-                                                    {item.producto.marca}
-
-                                                </h4>
-
-                                                <span>
-
-                                                    {item.producto.capacidadLitros} L
-
-                                                </span>
-
-                                            </div>
-
-                                            <button
-
-                                                type="button"
-
-                                                className="btn-eliminar"
-
-                                                onClick={() =>
-                                                    onEliminarLinea(index)
-                                                }
-
-                                                title="Eliminar producto"
-
+                                            <div
+                                                key={index}
+                                                className="pedido-card"
                                             >
 
-                                                🗑️
+                                                <div className="pedido-info">
 
-                                            </button>
+                                                    <div>
 
-                                        </div>
+                                                        <h4>
+                                                            {
+                                                                item.producto
+                                                                    .marca
+                                                            }
+                                                        </h4>
 
-                                        <div className="pedido-detalles">
+                                                        <span>
+                                                            {
+                                                                item.producto
+                                                                    .capacidadLitros
+                                                            }
+                                                            {" L"}
+                                                        </span>
 
-                                            <div>
+                                                    </div>
 
-                                                <span className="etiqueta">
 
-                                                    Cantidad
+                                                    <button
+                                                        type="button"
+                                                        className="btn-eliminar"
+                                                        onClick={() =>
+                                                            onEliminarLinea(
+                                                                index
+                                                            )
+                                                        }
+                                                        disabled={
+                                                            guardando
+                                                        }
+                                                        title="Eliminar producto"
+                                                    >
+                                                        🗑️
+                                                    </button>
 
-                                                </span>
+                                                </div>
 
-                                                <strong>
 
-                                                    {item.cantidad}
+                                                <div className="pedido-detalles">
 
-                                                </strong>
+                                                    <div>
+
+                                                        <span className="etiqueta">
+                                                            Cantidad
+                                                        </span>
+
+                                                        <strong>
+                                                            {
+                                                                item.cantidad
+                                                            }
+                                                        </strong>
+
+                                                    </div>
+
+
+                                                    <div>
+
+                                                        <span className="etiqueta">
+                                                            Prestados
+                                                        </span>
+
+                                                        <strong>
+                                                            {
+                                                                item.prestados
+                                                            }
+                                                        </strong>
+
+                                                    </div>
+
+
+                                                    <div>
+
+                                                        <span className="etiqueta">
+                                                            Subtotal
+                                                        </span>
+
+                                                        <strong className="subtotal">
+
+                                                            $
+                                                            {
+                                                                Number(
+                                                                    item.subtotal
+                                                                ).toFixed(2)
+                                                            }
+
+                                                        </strong>
+
+                                                    </div>
+
+                                                </div>
 
                                             </div>
 
-                                            <div>
+                                        )
+                                    )
+                                }
 
-                                                <span className="etiqueta">
+                            </div>
 
-                                                    Prestados
 
-                                                </span>
+                            <div className="pedido-total">
 
-                                                <strong>
+                                <span>
+                                    Total del pedido
+                                </span>
 
-                                                    {item.prestados}
+                                <strong>
 
-                                                </strong>
+                                    $
+                                    {
+                                        Number(
+                                            totalPedido
+                                        ).toFixed(2)
+                                    }
 
-                                            </div>
+                                </strong>
 
-                                            <div>
+                            </div>
 
-                                                <span className="etiqueta">
 
-                                                    Subtotal
+                            <div className="pedido-botones">
 
-                                                </span>
+                                <button
+                                    type="button"
+                                    className="btn-secondary"
+                                    onClick={
+                                        onVaciarPedido
+                                    }
+                                    disabled={
+                                        guardando
+                                    }
+                                >
+                                    Vaciar pedido
+                                </button>
 
-                                                <strong className="subtotal">
 
-                                                    $
+                                <button
+                                    type="button"
+                                    className="btn-primary"
+                                    onClick={
+                                        onGuardarPedido
+                                    }
+                                    disabled={
+                                        guardando
+                                    }
+                                >
 
-                                                    {Number(item.subtotal).toFixed(2)}
+                                    {
+                                        guardando
+                                            ? "Guardando..."
+                                            : modoEdicion
+                                                ? "Guardar cambios"
+                                                : "Guardar pedido"
+                                    }
 
-                                                </strong>
+                                </button>
 
-                                            </div>
+                            </div>
 
-                                        </div>
+                        </>
 
-                                    </div>
-
-                                ))
-
-                            }
-
-                        </div>
-
-                        <div className="pedido-total">
-
-                            <span>
-
-                                Total del pedido
-
-                            </span>
-
-                            <strong>
-
-                                $
-
-                                {Number(totalPedido).toFixed(2)}
-
-                            </strong>
-
-                        </div>
-
-                        <div className="pedido-botones">
-
-                            <button
-
-                                type="button"
-
-                                className="btn-secondary"
-
-                                onClick={onVaciarPedido}
-
-                            >
-
-                                Vaciar pedido
-
-                            </button>
-
-                            <button
-
-                                type="button"
-
-                                className="btn-primary"
-
-                                onClick={onGuardarPedido}
-
-                            >
-
-                                Guardar pedido
-
-                            </button>
-
-                        </div>
-
-                    </>
-
+                    )
             }
 
         </section>
